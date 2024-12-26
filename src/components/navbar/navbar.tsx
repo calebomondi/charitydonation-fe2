@@ -1,27 +1,35 @@
 import {useNavigate} from 'react-router-dom'
 import { Link } from "react-router-dom"
 import { useEffect, useState } from 'react'
+import { checkIfWalletIsConnected, getBalanceAndAddress } from '../../blockchain-services/useCharityDonation'
 
 export default function NavBar() {
     const navigate = useNavigate()
 
     const [shortAddress, setShortAddress] = useState<string>('')
+    const [balance,setBalance] = useState<string>()
 
     useEffect(() => {
-        /*
-        if (account.status === 'disconnected') {
-            navigate('/')
+        //check if disconnected
+        const redirecteIfNotConnected = async () => {
+            const connected = await checkIfWalletIsConnected();
+            if (!connected) {
+                navigate('/');
+            }
         }
-        if (account.addresses) {
-            setShortAddress(`${account.addresses.toString().slice(0, 6)}...${account.addresses.toString().slice(-4)}`)  
-        }
-            */
-    }, []);
+        redirecteIfNotConnected();
 
-    //disconnect the user and navigate to the home page
-    const handleDisconnect = () => {
-        navigate('/')
-    }
+        //set account address and balance
+        const getAccount = async () => {
+            const accountData = await getBalanceAndAddress();
+            if (accountData) {
+                const { account, balanceEth } = accountData;
+                setShortAddress(account);
+                setBalance(balanceEth);
+            }
+        }
+        getAccount()
+    }, []);
     
   return (
     <div className="navbar bg-base-100">
@@ -90,11 +98,12 @@ export default function NavBar() {
                     tabIndex={0}
                     className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-4 w-auto p-3 shadow"
                 >
-                    <li className="h-6 m-1 p-1 flex justify-center items-center text-base">
-                        {shortAddress}
+                    <li className="h-6 m-1 p-1 flex justify-center items-center text-base text-teal-500 font-semibold hover:cursor-pointer">
+                        {`${shortAddress.slice(0,6)}....${shortAddress.slice(-4)}`}
+                        
                     </li>
-                    <li className="h-6 m-1 p-1 flex justify-center items-center">
-                        <button className='text-base' onClick={() => handleDisconnect()}>Disconnect</button>
+                    <li className="h-6 m-1 p-1 flex justify-center items-center text-teal-500 font-semibold hover:cursor-pointer">
+                        {balance?.slice(0,6)} sETH
                     </li>
                 </ul>
             </div>
