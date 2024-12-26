@@ -3,6 +3,7 @@ import Home from '../Home/home';
 import Donate from '../donations/donate';
 import MyDonations from '../donations/mydonations';
 import MyFundraisers from '../fundraisers/myfundraisers';
+import Fundraisers from '../fundraisers/fundraisers';
 
 
 const AuthenticatedApp: React.FC = () => {
@@ -23,7 +24,7 @@ const AuthenticatedApp: React.FC = () => {
             />
             <Route
                 path="/fundraisers"
-                element={''}
+                element={<Fundraisers />}
             />
             <Route
                 path="/my-fundraisers"
