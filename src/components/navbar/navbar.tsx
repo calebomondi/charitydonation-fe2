@@ -1,27 +1,25 @@
-import { useDisconnect, useAccount } from 'wagmi'
 import {useNavigate} from 'react-router-dom'
 import { Link } from "react-router-dom"
 import { useEffect, useState } from 'react'
 
 export default function NavBar() {
     const navigate = useNavigate()
-    const account = useAccount()
-    const { disconnect } = useDisconnect()
 
     const [shortAddress, setShortAddress] = useState<string>('')
 
     useEffect(() => {
+        /*
         if (account.status === 'disconnected') {
             navigate('/')
         }
         if (account.addresses) {
             setShortAddress(`${account.addresses.toString().slice(0, 6)}...${account.addresses.toString().slice(-4)}`)  
         }
-    }, [account.status]);
+            */
+    }, []);
 
     //disconnect the user and navigate to the home page
     const handleDisconnect = () => {
-        disconnect()
         navigate('/')
     }
     
