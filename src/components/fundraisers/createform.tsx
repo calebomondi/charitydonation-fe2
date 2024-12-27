@@ -1,38 +1,116 @@
 import { createCampaign } from "../../blockchain-services/useCharityDonation"
-import { useState } from "react"
+import React, { useState } from "react"
+import { CreateCampaignArgs } from "../../types";
 
 export default function CreateForm() {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [formValues, setFormValues] = useState<CreateCampaignArgs>({
+        title: '',
+        description: '',
+        target: '',
+        durationDays: ''
+    })
 
-    const handleCreate = async () => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const {name, value} = e.target;
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            [name]: value,
+        }))
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
         setIsLoading(true)
         try {
             await createCampaign(
                 {
-                    title: "test campaign 04",
-                    description: "A random campaign", 
-                    target: "0.01", 
-                    durationDays: "10"
+                    title: formValues.title,
+                    description: formValues.description, 
+                    target: formValues.target, 
+                    durationDays: formValues.durationDays
                 }
             );
         } catch (error:any) {
             console.error("Failed to create campaign:", error.message);
         } finally {
             setIsLoading(false)
+            setFormValues({
+                title: '',
+                description: '',
+                target: '',
+                durationDays: ''
+            })
         }
     }
 
   return (
-    <div className="bg-teal-400">
-      <button 
-        onClick={handleCreate} 
-        className="btn btn-warning"
-        disabled={isLoading}
-    >
-        {
-            isLoading ? 'creating ...' : 'create campaign'
-        }
-      </button>
+    <div className="flex justify-center items-center">
+        <div className="md:w-1/2 m-2 p-2 border border-green-700  flex flex-col justify-center items-center rounded-lg">
+            <h2 className="text-center text-lg font-semibold">Create New Fundraiser</h2>
+            <form onSubmit={handleSubmit} className="w-full p-1">
+                <label className="input input-bordered flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                    Title
+                    <input 
+                        type="text" 
+                        id="title"
+                        name="title"
+                        value={formValues.title}
+                        onChange={handleChange}
+                        className="md:w-5/6 p-2 text-white" 
+                        placeholder="Fundraiser Name" 
+                        required
+                    />
+                </label>
+                <textarea
+                    placeholder="Fundraiser descritption"
+                    className="textarea textarea-bordered textarea-sm w-full"
+                    id="description"
+                    name="description"
+                    value={formValues.description}
+                    onChange={handleChange}
+                    required
+                >
+                </textarea>
+                <label className="input input-bordered flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                    Target
+                    <input 
+                        type="text" 
+                        id="target"
+                        name="target"
+                        value={formValues.target}
+                        onChange={handleChange}
+                        className="text-white md:w-5/6 p-2" 
+                        placeholder="In ETH" 
+                        required
+                    />
+                </label>
+                <label className="input input-bordered flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                    Duration
+                    <input 
+                        type="text" 
+                        id="durationDays"
+                        name="durationDays"
+                        value={formValues.durationDays}
+                        onChange={handleChange}
+                        className="md:w-5/6 p-2 text-white" 
+                        placeholder="In Days" 
+                        required
+                    />
+                </label>
+                <div className="p-1 flex justify-center">
+                    <button 
+                        type="submit" 
+                        className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
+                    >
+                        {
+                            isLoading ? 'creating ...' : 'create'
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
   )
 }
