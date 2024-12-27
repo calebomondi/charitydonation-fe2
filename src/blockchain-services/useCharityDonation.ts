@@ -209,3 +209,35 @@ export const addAdmin = async (admin:string) => {
         throw new Error("Failed to add campaign admin: " + error.message);
     }
 }
+
+//remove admin
+export const removeAdmin = async (admin:string) => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        //create campaign
+        const tx = await contract.methods
+        .removeCampaignAdmin(admin)
+        .send({ from: account })
+
+        console.log(`txn: ${tx.transactionHash}`)
+
+    } catch (error:any) {
+        // Handle specific error cases
+        if (error.message.includes("This Address Is Not An Admin!")) {
+            throw new Error("This Address Is Already An Admin!");
+        }
+        
+        if (error.code === 4001) {
+            throw new Error("Transaction rejected by user");
+        }
+  
+        console.error("Failed to add campaign admin:", error);
+        throw new Error("Failed to add campaign admin: " + error.message);
+    }
+}
