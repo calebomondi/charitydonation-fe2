@@ -2,17 +2,35 @@ import { contractABI, contractADDR } from "./core";
 import Web3 from "web3";
 import { CampaignDataArgs, CreateCampaignArgs } from "../types";
 
-//connect to provider
-const provider = new Web3.providers.HttpProvider('https://eth-sepolia.g.alchemy.com/v2/sZ5I9vk5LlS9LZTeLFjkQ8CJ3bAnTthd');
-const web3 = new Web3(provider);
-//create contract instance
-const contract = new web3.eth.Contract(contractABI, contractADDR);
+//For Events (Alchemy)
+const _provider = new Web3.providers.WebsocketProvider('wss://eth-sepolia.g.alchemy.com/v2/sZ5I9vk5LlS9LZTeLFjkQ8CJ3bAnTthd');
+const _web3 = new Web3(_provider);
+const _contract = new _web3.eth.Contract(contractABI, contractADDR);
+
+//For Transactions (MetaMask)
+const getWeb3Provider = () => {
+    // Check if MetaMask is installed
+    const ethereum = (window as any).ethereum;
+    if (!ethereum) {
+        console.log('Please install MetaMask!');
+        throw new Error('No ethereum provider found');
+    }
+
+    // Create Web3 instance with MetaMask
+    const web3 = new Web3(ethereum);
+    return web3;
+}
+const getContract = (web3: Web3, contractAddress: string, contractABI: any) => {
+    return new web3.eth.Contract(contractABI, contractAddress);
+};
+const web3 = getWeb3Provider();
+const contract = getContract(web3, contractADDR, contractABI);
 
 //connect to wallet
 export async function connectWallet() : Promise<string | null> {
     try {
+        // Check if MetaMask is installed
         const ethereum = (window as any).ethereum;
-
         if (!ethereum) {
             console.log('Please install MetaMask!');
             throw new Error('No ethereum provider found');
@@ -117,53 +135,43 @@ export const createCampaign = async ({title, description, target, durationDays} 
         const { account } = balanceAndAddress;
 
         //create campaign
-        await contract.methods.createCampaign(title, description, BigInt(targetWei), BigInt(durationDays)).send({from: account})
+        const tx = await contract.methods
+        .createCampaign(title, description, BigInt(targetWei), BigInt(durationDays))
+        .send({ from: account })
 
-        //listen for event
-        const campaignCreatedEvent = contract.events.CampaignCreated()
-        campaignCreatedEvent.on('data', (event) => {
-            console.log(`Created Campaign ${event}`)
-            //upload to DB
-        })
+        console.log(`txn: ${tx}`)
+
+    } catch (error:any) {
+        // Handle specific error cases
+        if (error.message.includes("Campaign already exists")) {
+            throw new Error(`Campaign "${title}" already exists`);
+        }
         
-
-    } catch (error) {
-        console.error("Cannot Create Campaign")
-        throw error
+        if (error.code === 4001) {
+            throw new Error("Transaction rejected by user");
+        }
+    
+        if (error.message.includes("insufficient funds")) {
+            throw new Error("Insufficient funds for transaction");
+        }
+  
+        console.error("Failed to create campaign:", error);
+        throw new Error("Failed to create campaign: " + error.message);
     }
 }
 
-/**
- *  function createCampaign(string memory _title, string memory _description,uint256 _target, uint256 _durationdays) public  {
-        //check if campaign already exists
-        unchecked {
-            for(uint256 i; i < campaigns[msg.sender].length; i++) {
-                string storage campaignTitle = campaigns[msg.sender][i].title;
-                bool exists = keccak256(abi.encodePacked(campaignTitle)) == keccak256(abi.encodePacked(_title));
-                if (exists) {
-                    revert(string(abi.encodePacked("Campaign ", _title, " already exists!")));
-                }
-            }
-        }
+export const listenToCampaignEvents = () => {
+    //listen for event
+    const subscription = _contract.events.CampaignCreated();
+    subscription.on('data', (event) => {
+        console.log(`Created Campaign ==> ${event.returnValues}`);
+        //upload to DB
+    });
+    subscription.on('error', console.error);
 
-        //create campaign
-        Campaign memory newCampaign =  Campaign(
-            {
-                campaign_id : campaigns[msg.sender].length + 1,
-                title: _title,
-                description: _description, 
-                campaignAddress: msg.sender,
-                targetAmount: _target, 
-                raisedAmount  :  0, 
-                balance: 0,
-                deadline: block.timestamp + (_durationdays * 1 days),
-                isCompleted: false,
-                isCancelled: false
-            }
-        );
-        campaigns[msg.sender].push(newCampaign);
-
-        //emit event
-        emit CampaignCreated(campaigns[msg.sender].length, msg.sender, _title, _target, block.timestamp + (_durationdays * 1 days));
+    // Return unsubscribe function
+    return () => {
+        subscription.unsubscribe();
     }
- */
+    
+}
