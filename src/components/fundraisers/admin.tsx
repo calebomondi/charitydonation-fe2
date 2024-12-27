@@ -1,5 +1,6 @@
 import { addAdmin, removeAdmin } from "../../blockchain-services/useCharityDonation"
 import React, { useState } from "react"
+import ViewCampaignAdmins from "./viewcampaignadmins"
 
 export default function AdminManagement() {
   const [isAdding, setIsAdding] = useState<boolean>(false)
@@ -46,13 +47,13 @@ export default function AdminManagement() {
 
   return (
     <div className="flex justify-center items-center p-2">
-      <div className="md:w-1/2">
+      <div className="md:w-1/2 m-2 p-2 w-full">
         <div className="join join-vertical w-full">
           <div className="collapse collapse-arrow join-item border-green-700 border">
             <input type="radio" name="my-accordion-4" defaultChecked />
             <div className="collapse-title text-xl font-medium">Fundraiser Admins</div>
             <div className="collapse-content">
-              <p>hello</p>
+              <ViewCampaignAdmins />
             </div>
           </div>
           <div className="collapse collapse-arrow join-item border-green-700 border">
@@ -79,7 +80,7 @@ export default function AdminManagement() {
                       className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
                     >
                       {
-                        isAdding ? 'Adding ...' : 'Add'
+                        isAdding ? (<span className="loading loading-ring loading-xs"></span>) : 'Add'
                       }
                     </button>
                   </div>
@@ -110,7 +111,7 @@ export default function AdminManagement() {
                       className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
                     >
                       {
-                        isRemoving ? 'Removing ...' : 'Remove'
+                        isRemoving ? (<span className="loading loading-ring loading-xs"></span>) : 'Remove'
                       }
                     </button>
                   </div>

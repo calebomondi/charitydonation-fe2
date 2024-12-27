@@ -105,7 +105,7 @@ export default function CreateForm() {
                         className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
                     >
                         {
-                            isLoading ? 'creating ...' : 'create'
+                            isLoading ? (<span className="loading loading-ring loading-xs"></span>) : 'create'
                         }
                     </button>
                 </div>
