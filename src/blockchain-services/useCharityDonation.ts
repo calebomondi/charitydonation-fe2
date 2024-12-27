@@ -241,3 +241,39 @@ export const removeAdmin = async (admin:string) => {
         throw new Error("Failed to add campaign admin: " + error.message);
     }
 }
+
+//cancel campaign
+export const cancelCampaign = async (campaignId:number,campaignAddress:string) => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        //cancel campaign
+        const tx = await contract.methods
+        .cancelCampaign(BigInt(campaignId),campaignAddress)
+        .send({ from: account })
+
+        console.log(`txn: ${tx.transactionHash}`)
+
+    } catch (error:any) {
+        // Handle specific error cases
+        if (error.message.includes("This Campaign Has Already Been Completed!")) {
+            throw new Error("This Campaign Has Already Been Completed!");
+        }
+
+        if (error.message.includes("This Campaign Has Already Raised Funds! Refund First Then Cancel!")) {
+            throw new Error("This Campaign Has Already Raised Funds! Refund First Then Cancel!");
+        }
+        
+        if (error.code === 4001) {
+            throw new Error("Transaction rejected by user");
+        }
+  
+        console.error("Failed to add campaign admin:", error);
+        throw new Error("Failed to add campaign admin: " + error.message);
+    }
+}
