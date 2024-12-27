@@ -5,7 +5,7 @@ import { CampaignDataArgs, CreateCampaignArgs } from "../types";
 //For Events (Alchemy)
 const _provider = new Web3.providers.WebsocketProvider('wss://eth-sepolia.g.alchemy.com/v2/sZ5I9vk5LlS9LZTeLFjkQ8CJ3bAnTthd');
 const _web3 = new Web3(_provider);
-const _contract = new _web3.eth.Contract(contractABI, contractADDR);
+export const _contract = new _web3.eth.Contract(contractABI, contractADDR);
 
 //For Transactions (MetaMask)
 const getWeb3Provider = () => {
@@ -139,7 +139,7 @@ export const createCampaign = async ({title, description, target, durationDays} 
         .createCampaign(title, description, BigInt(targetWei), BigInt(durationDays))
         .send({ from: account })
 
-        console.log(`txn: ${tx}`)
+        console.log(`txn: ${tx.blockHash}`)
 
     } catch (error:any) {
         // Handle specific error cases
@@ -160,6 +160,7 @@ export const createCampaign = async ({title, description, target, durationDays} 
     }
 }
 
+/*
 export const listenToCampaignEvents = () => {
     //listen for event
     const subscription = _contract.events.CampaignCreated();
@@ -174,4 +175,37 @@ export const listenToCampaignEvents = () => {
         subscription.unsubscribe();
     }
     
+}
+*/
+
+//add admin
+export const addAdmin = async (admin:string) => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        //create campaign
+        const tx = await contract.methods
+        .addCampaignAdmin(admin)
+        .send({ from: account })
+
+        console.log(`txn: ${tx.transactionHash}`)
+
+    } catch (error:any) {
+        // Handle specific error cases
+        if (error.message.includes("This Address Is Already An Admin!")) {
+            throw new Error("This Address Is Already An Admin!");
+        }
+        
+        if (error.code === 4001) {
+            throw new Error("Transaction rejected by user");
+        }
+  
+        console.error("Failed to add campaign admin:", error);
+        throw new Error("Failed to add campaign admin: " + error.message);
+    }
 }
