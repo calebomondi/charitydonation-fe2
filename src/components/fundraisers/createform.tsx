@@ -1,18 +1,8 @@
-import { createCampaign, listenToCampaignEvents } from "../../blockchain-services/useCharityDonation"
-import { useEffect, useState } from "react"
+import { createCampaign } from "../../blockchain-services/useCharityDonation"
+import { useState } from "react"
 
 export default function CreateForm() {
     const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        // Get contract instance and set up listener
-        const unsubscribe = listenToCampaignEvents();
-        
-        // Cleanup listener when component unmounts
-        return () => {
-            if (unsubscribe) unsubscribe();
-        }
-    },[])
 
     const handleCreate = async () => {
         setIsLoading(true)
@@ -33,7 +23,7 @@ export default function CreateForm() {
     }
 
   return (
-    <div>
+    <div className="bg-teal-400">
       <button 
         onClick={handleCreate} 
         className="btn btn-warning"

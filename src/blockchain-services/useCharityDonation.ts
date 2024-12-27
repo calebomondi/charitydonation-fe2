@@ -193,7 +193,7 @@ export const addAdmin = async (admin:string) => {
         .addCampaignAdmin(admin)
         .send({ from: account })
 
-        console.log(`txn: ${tx.transactionHash}`)
+        console.log(`txn-add-admin: ${tx.transactionHash}`)
 
     } catch (error:any) {
         // Handle specific error cases
@@ -225,7 +225,7 @@ export const removeAdmin = async (admin:string) => {
         .removeCampaignAdmin(admin)
         .send({ from: account })
 
-        console.log(`txn: ${tx.transactionHash}`)
+        console.log(`txn-remove-admin: ${tx.transactionHash}`)
 
     } catch (error:any) {
         // Handle specific error cases
@@ -257,7 +257,7 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
         .cancelCampaign(BigInt(campaignId),campaignAddress)
         .send({ from: account })
 
-        console.log(`txn: ${tx.transactionHash}`)
+        console.log(`txn-cancel-campaign: ${tx.transactionHash}`)
 
     } catch (error:any) {
         // Handle specific error cases
@@ -275,5 +275,59 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
   
         console.error("Failed to add campaign admin:", error);
         throw new Error("Failed to add campaign admin: " + error.message);
+    }
+}
+
+//check if admin is active
+const isActiveAdmin = async (admin:string,campaignAddress:string) : Promise<boolean> => {
+    try {
+        const isActive:boolean = await contract.methods.admins(campaignAddress, admin).call();
+        return isActive;
+    } catch (error) {
+        console.error(`Failed to check admin status for ${admin}:`, error);
+        throw error;
+    }
+};
+
+//get campaign admins
+export const getCampaignAdmins = async () : Promise<string[]> => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        //get admins
+        const result: { withdrwals: any, admins: string[] } = await contract.methods
+        .viewWithdrawals(account)
+        .call()
+
+        const {
+            withdrwals: withdrawalsList,
+            admins: adminsList
+        } = result
+
+        console.log(`withdrawals -> ${withdrawalsList}`)
+
+        // Check status for all admins in parallel
+        const adminStatuses = await Promise.all(
+            adminsList.map(async (admin) => ({
+                address: admin,
+                isActive: await isActiveAdmin(admin,account)
+            }))
+        );
+        
+        // Filter only active admins
+        const activeAdmins = adminStatuses
+            .filter(admin => admin.isActive)
+            .map(admin => admin.address);
+
+        return activeAdmins
+
+    } catch (error) {
+        console.error("Failed to get campaign admins:", error);
+        return [];
     }
 }

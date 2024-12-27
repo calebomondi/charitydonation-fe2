@@ -1,6 +1,9 @@
 import NavBar from "../navbar/navbar"
 import ViewMyCampaigns from "./viewmycampaigns"
 import CreateForm from "./createform"
+import AdminManagement from "./admin"
+import ViewCampaignAdmins from "./viewcampaignadmins"
+
 import { _contract } from "../../blockchain-services/useCharityDonation"
 
 import { useEffect, useState } from "react"
@@ -47,7 +50,7 @@ export default function MyFundraisers() {
     //add admin event
     const removeAdmin = _contract.events.RemoveAdmin();
     removeAdmin.on('data', (event) => {
-        console.log(`Removed Admin ==> ${event.returnValues}`);
+        console.log(`Removed Admin ==> ${JSON.stringify(event.returnValues)}`);
         //handle event
     });
     removeAdmin.on('error', console.error);
@@ -64,7 +67,9 @@ export default function MyFundraisers() {
     <main>
       <NavBar />   
       <CreateForm />     
+      <AdminManagement />
       <ViewMyCampaigns /> 
+      <ViewCampaignAdmins />
     </main>
   )
 }
