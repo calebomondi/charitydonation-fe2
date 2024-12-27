@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useLocation} from 'react-router-dom'
 import { Link } from "react-router-dom"
 import { useEffect, useState } from 'react'
 import { checkIfWalletIsConnected, getBalanceAndAddress } from '../../blockchain-services/useCharityDonation'
@@ -8,6 +8,10 @@ export default function NavBar() {
 
     const [shortAddress, setShortAddress] = useState<string>('')
     const [balance,setBalance] = useState<string>()
+
+    //get current path
+    const location = useLocation()
+    console.log(`location: ${location.pathname}`)
 
     useEffect(() => {
         //check if disconnected
@@ -29,7 +33,7 @@ export default function NavBar() {
             }
         }
         getAccount()
-    }, []);
+    }, [location]);
     
   return (
     <div className="navbar bg-base-100">
@@ -54,16 +58,13 @@ export default function NavBar() {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
                 <li>
-                    <Link to="/donate" className='text-base'>Donate</Link>
+                    <Link to="/fundraisers" className={`text-base ${location.pathname === '/fundraisers' && 'text-green-600'}`}>Fundraisers</Link>
                 </li>
                 <li>
-                    <Link to="/my-donations" className='text-base'>My Donations</Link>
+                    <Link to="/my-fundraisers" className={`text-base ${location.pathname === '/my-fundraisers' && 'text-green-600'}`}>My Fundraisers</Link>
                 </li>
                 <li>
-                    <Link to="/fundraisers" className='text-base'>Fundraisers</Link>
-                </li>
-                <li>
-                    <Link to="/my-fundraisers" className='text-base'>My Fundraisers</Link>
+                    <Link to="/my-donations" className={`text-base ${location.pathname === '/my-donations' && 'text-green-600'}`}>My Donations</Link>
                 </li>
             </ul>
             </div>
@@ -72,16 +73,13 @@ export default function NavBar() {
         <div className="navbar-center hidden lg:flex">
             <ul className="menu menu-horizontal px-1">
                 <li>
-                    <Link to="/donate" className='text-base'>Donate</Link>
+                    <Link to="/fundraisers" className={`text-base ${location.pathname === '/fundraisers' && 'text-green-600'}`}>Fundraisers</Link>
                 </li>
                 <li>
-                    <Link to="/my-donations" className='text-base'>My Donations</Link>
+                    <Link to="/my-fundraisers" className={`text-base ${location.pathname === '/my-fundraisers' && 'text-green-600'}`}>My Fundraisers</Link>
                 </li>
                 <li>
-                    <Link to="/fundraisers" className='text-base'>Fundraisers</Link>
-                </li>
-                <li>
-                    <Link to="/my-fundraisers" className='text-base'>My Fundraisers</Link>
+                    <Link to="/my-donations" className={`text-base ${location.pathname === '/my-donations' && 'text-green-600'}`}>My Donations</Link>
                 </li>
             </ul>
         </div>
@@ -98,11 +96,11 @@ export default function NavBar() {
                     tabIndex={0}
                     className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-4 w-auto p-3 shadow"
                 >
-                    <li className="h-6 m-1 p-1 flex justify-center items-center text-base text-teal-500 font-semibold hover:cursor-pointer">
+                    <li className="h-6 m-1 p-1 flex justify-center items-center text-base text-green-600 font-semibold hover:cursor-pointer">
                         {`${shortAddress.slice(0,6)}....${shortAddress.slice(-4)}`}
                         
                     </li>
-                    <li className="h-6 m-1 p-1 flex justify-center items-center text-teal-500 font-semibold hover:cursor-pointer">
+                    <li className="h-6 m-1 p-1 flex justify-center items-center text-green-600 font-semibold hover:cursor-pointer">
                         {balance?.slice(0,6)} sETH
                     </li>
                 </ul>
