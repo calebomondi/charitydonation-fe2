@@ -8,18 +8,19 @@ import { _contract } from "../../blockchain-services/useCharityDonation"
 import { useEffect, useState } from "react"
 import { ContractLogsSubscription } from "web3-eth-contract"
 
+import { supabase } from "../../supabase/supabaseClient"
+
+import { toast } from "react-toastify"
+
 export default function MyFundraisers() {
+  //campaign creation
+  const [creating, setCreating] = useState<boolean>(false)
   //define display states
   const [viewAdmin, setViewAdmin] = useState<boolean>(false)
   const [viewCreate, setViewCreate] = useState<boolean>(false)
   const [viewCompleted, setViewCompleted] = useState<boolean>(false)
   const [viewCancelled, setViewCancelled] = useState<boolean>(false)
   const [viewActive, setViewActive] = useState<boolean>(true)
-  //define event states
-  const [campaignCreatedEvent,setCampaignCreatedEvent] = useState<null>()
-  const [campaignCancelledEvent,setCampaignCancelledEvent] = useState<null>()
-  const [adminAddedEvent,setAdminAddedEvent] = useState<null>()
-  const [adminRemovedEvent,setAdminRemovedEvent] = useState<null>()
 
   useEffect(() => {
     //listen to multiple events
@@ -27,9 +28,64 @@ export default function MyFundraisers() {
 
     //campaign creation event
     const campaignCreated = _contract.events.CampaignCreated();
-    campaignCreated.on('data', (event) => {
-        console.log(`Created Campaign ==> ${event.returnValues}`);
-        //upload to DB
+    campaignCreated.on('data', async (event) => {
+        /*__upload to DB__*/
+        // Get stored image data
+        const storedImage = localStorage.getItem('pendingCampaignImage');
+
+        if(storedImage) {
+          setCreating(true)
+          try {
+            const imageData = JSON.parse(storedImage);
+            // Convert base64 back to file
+            const _fetch = await fetch(imageData.data);
+            const blob = await _fetch.blob();
+            const file = new File([blob], imageData.name, { type: imageData.type });
+            
+            const campaignId = event.returnValues.campaign_id;
+            const campaignAd = event.returnValues.campaignAddress
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${campaignAd}_${campaignId}.${fileExt}`;
+
+            // Upload to Supabase Storage
+            const { error } = await supabase.storage
+                .from('undugu')
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('undugu')
+                .getPublicUrl(fileName);
+
+            // Store reference in Supabase database
+            const { error: dbError } = await supabase
+                .from('unduguimages')
+                .insert([
+                    {
+                      fraddress: campaignAd?.toString(),
+                      frid: Number(campaignId),
+                      url: publicUrl,
+                    },
+                ]);
+
+            if (dbError) throw dbError;
+
+            // Clear stored image after successful upload
+            localStorage.removeItem('pendingCampaignImage');
+
+            setCreating(false)
+
+            //notify creator
+            toast.success(`'${event.returnValues.title}' Fundraiser Was Created Successfully!`)
+
+          } catch (error) {
+            console.log('Failed To Upload Image: ',error)
+            toast.error('Failed To Upload Image!')
+            setCreating(false)
+          }
+        }
     });
     campaignCreated.on('error', console.error);
     subscriptions.push(campaignCreated)
@@ -37,7 +93,8 @@ export default function MyFundraisers() {
     //campaign cancelled event
     const campaignCancelled = _contract.events.CampaignCancelled();
     campaignCancelled.on('data', (event) => {
-        console.log(`Campaign Cancelled ==> ${event.returnValues}`);
+        const id = event.returnValues.campaign_id
+        toast.success(`You Have Cancelled Fundraiser of ID ${id?.toString()}`)
         //handle event
     });
     campaignCancelled.on('error', console.error);
@@ -46,8 +103,8 @@ export default function MyFundraisers() {
     //add admin event
     const addAdmin = _contract.events.AddAdmin();
     addAdmin.on('data', (event) => {
-        console.log(`Added Admin ==> ${event.returnValues}`);
-        //handle event
+      const admin = event.returnValues.admin
+      toast.success(`Added ${admin?.toString().slice(0,6)}...${admin?.toString().slice(-4)} As Fundraiser Admin`)
     });
     addAdmin.on('error', console.error);
     subscriptions.push(addAdmin)
@@ -55,8 +112,8 @@ export default function MyFundraisers() {
     //add admin event
     const removeAdmin = _contract.events.RemoveAdmin();
     removeAdmin.on('data', (event) => {
-        console.log(`Removed Admin ==> ${JSON.stringify(event.returnValues)}`);
-        //handle event
+      const admin = event.returnValues.admin
+      toast.success(`Added ${admin?.toString().slice(0,6)}...${admin?.toString().slice(-4)} As Fundraiser Admin`)
     });
     removeAdmin.on('error', console.error);
     subscriptions.push(removeAdmin)
@@ -153,7 +210,21 @@ export default function MyFundraisers() {
         </div>
       </div>
       {
-        viewCreate && (<CreateForm />)
+        viewCreate && (
+          <>
+            {
+              creating ? (
+                <div className="w-full bg-green-600 bg-opacity-60 h-dvh grid place-items-center">
+                  <div className="flex justify-center items-center flex-col p-1 bg-black bg-opacity-50 rounded-xl">
+                    <span className="text-lg font-mono">Working on you fundraiser</span> <span className="loading loading-infinity loading-lg"></span>
+                  </div>
+                </div>
+              ) : (
+                <CreateForm />
+              )
+            }
+          </>
+        )
       }     
       {
         viewAdmin && (<AdminManagement />)

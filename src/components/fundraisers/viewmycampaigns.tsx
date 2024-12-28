@@ -43,7 +43,7 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                 ))
             ) : (
                 <div className="text-green-400 p-2 m-2 h-1/3 grid place-items-center">
-                    <p className="p-1 text-lg font-semibold mt-10">There Are No Campigns Under This Category!</p>
+                    <p className="p-1 text-lg font-semibold mt-10 text-center">There Are No Campigns Under This Category!</p>
                     <span className="loading loading-dots loading-lg"></span>
                 </div>
             )

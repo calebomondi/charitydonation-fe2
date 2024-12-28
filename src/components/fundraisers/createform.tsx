@@ -1,9 +1,11 @@
 import { createCampaign } from "../../blockchain-services/useCharityDonation"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { CreateCampaignArgs } from "../../types";
 
 export default function CreateForm() {
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [formValues, setFormValues] = useState<CreateCampaignArgs>({
         title: '',
         description: '',
@@ -17,6 +19,23 @@ export default function CreateForm() {
             ...prevValues,
             [name]: value,
         }))
+    }
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedImage(e.target.files[0]);
+            // Store file temporarily
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                localStorage.setItem('pendingCampaignImage', JSON.stringify({
+                    name: file.name,
+                    type: file.type,
+                    data: reader.result
+                }));
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +61,10 @@ export default function CreateForm() {
                 target: '',
                 durationDays: ''
             })
+            setSelectedImage(null)
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         }
     }
 
@@ -99,7 +122,28 @@ export default function CreateForm() {
                         required
                     />
                 </label>
-                <div className="p-1 flex justify-center">
+                <div className="w-full m-1 font-semibold text-green-600">
+                    <span>Image Upload</span> <span className="italic text-sm">(1080x1080)</span>
+                </div>
+                <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="file-input file-input-bordered w-full" 
+                />
+                {/*Preview Selected Image */}
+                {
+                    selectedImage && (
+                        <div className="w-full p-2 grid place-items-center">
+                            <img
+                                src={URL.createObjectURL(selectedImage)}
+                                alt="Preview"
+                                className="w-48 h-48 rounded-lg"
+                            />
+                        </div>
+                    )
+                }
+                <div className="p-1 flex justify-center mt-2">
                     <button 
                         type="submit" 
                         className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
