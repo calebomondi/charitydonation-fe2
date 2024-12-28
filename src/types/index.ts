@@ -25,3 +25,15 @@ export interface CampaignDataArgs {
     isCompleted: boolean;
     isCancelled: boolean;
 }
+
+export interface ImageMetaData {
+    address: string;
+    id: number;
+    url: string;
+}
+
+export interface ImageUploadProps {
+    bucket: string
+    onUploadComplete?: (imageUrl: string) => void
+    onError?: (error: Error) => void
+}
