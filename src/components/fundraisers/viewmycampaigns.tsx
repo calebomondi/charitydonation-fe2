@@ -95,11 +95,11 @@ export default function ViewMyCampaigns({status}:{status:string}) {
           endDate: deadline,
           progress: progress.toString()
         };
-      });
+    });
 
-      setTimeout(() =>{
-        setCombined(combinedData)
-      },1000)
+    setTimeout(() =>{
+    setCombined(combinedData)
+    },1000)
 
   return (
     <div>
@@ -111,7 +111,7 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                             <>
                                 {
                                     campaign.imageUrl && (
-                                        <div className="card card-compact bg-base-100 w-1/4 md:h-1/2 shadow-xl m-1">
+                                        <div className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-xl m-1">
                                             <figure className="max-h-60">
                                                 <img
                                                 src={campaign.imageUrl || ''}

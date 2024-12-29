@@ -314,4 +314,28 @@ export const getCampaignAdmins = async () : Promise<string[]> => {
     }
 }
 
-//cancel campaign
+//View Campaign Details
+export const viewCampaignDetails = async (id:number, address:string) : Promise<{details:CampaignDataArgs | {}, number:number, donors:string[]}> => {
+    try {
+        //get campaign details
+        const result: [CampaignDataArgs, string, string[]] = await contract.methods
+        .getCampaignDetails(id,address)
+        .call()
+
+        console.log(`number-> ${Number(result[1])}`)
+
+        return {
+            details: result[0] || {},  // Campaign details
+            number: Number(result[1]) || 0,  // Convert donor count to number
+            donors: result[2] || []  // Donors array
+        };
+        
+    } catch (error) {
+        console.error("Failed to fetch campaign details:", error);
+        return {
+            details:{},
+            number:0,
+            donors:[]
+        }
+    }
+}
