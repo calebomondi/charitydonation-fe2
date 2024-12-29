@@ -273,18 +273,27 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
     } catch (error:any) {
         // Handle specific error cases
         if (error.message.includes("This Campaign Has Already Been Completed!")) {
+            toast.error("This Campaign Has Already Been Completed, Cannot Cancel!")
             throw new Error("This Campaign Has Already Been Completed!");
         }
 
         if (error.message.includes("This Campaign Has Already Raised Funds! Refund First Then Cancel!")) {
+            toast.error("This Campaign Has Already Raised Funds! Refund First Then Cancel!")
             throw new Error("This Campaign Has Already Raised Funds! Refund First Then Cancel!");
+        }
+
+        if (error.message.includes("Only Admins Can Perform This Action!")) {
+            toast.error("Only Admins Can Perform This Action!")
+            throw new Error("Only Admins Can Perform This Action!");
         }
         
         if (error.code === 4001) {
+            toast.error("Transanction Failed!")
             throw new Error("Transaction rejected by user");
         }
   
         console.error("Failed To Cancel Campaign:", error);
+        toast.error("Failed To Cancel Campaign!")
         throw new Error("Failed to add campaign admin: " + error.message);
     }
 }
@@ -397,11 +406,13 @@ export const refundDonors = async (campaignId:number,campaignAddress:string) => 
             'This Campaign Is Successful Cannot be Cancelled!': 'Campaign is successful and cannot be cancelled',
             'Insufficient contract balance': 'Contract has insufficient balance for refund',
             'Transfer failed': 'Failed to transfer refund to donor',
-            'Refund Was Unsuccessful!': 'Refund process failed to complete'
+            'Refund Was Unsuccessful!': 'Refund process failed to complete',
+            "Only Admins Can Perform This Action!":"Only Admins Can Perform This Action!"
         };
     
         // Handle MetaMask/wallet errors
         if (error.code === 4001) {
+            toast.error('Transanction failed!')
             throw new Error('Transaction rejected by user');
         }
     
@@ -537,7 +548,7 @@ export const withdrawFromCampaign = async (campaignId:number,campaignAddress:str
             "Insufficient contract balance": 'Not enough funds in the contract',
             "Amount Cannot be Zero Or Exceed The Raised Amount!": 'Invalid withdrawal amount',
             "Transfer failed": 'Failed to transfer funds',
-            "Not an admin": 'You do not have permission to withdraw funds'
+            "Only Admins Can Perform This Action!": "Only Admins Can Perform This Action!"
         };
     
         // Handle MetaMask/wallet errors

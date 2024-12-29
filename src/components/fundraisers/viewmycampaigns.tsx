@@ -1,4 +1,4 @@
-import { myCampaigns } from "../../blockchain-services/useCharityDonation"
+import {  } from "../../blockchain-services/useCharityDonation"
 import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import { useState, useEffect } from "react"
 
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 import { _web3 } from "../../blockchain-services/useCharityDonation"
 
-import { getBalanceAndAddress } from "../../blockchain-services/useCharityDonation"
+import { getBalanceAndAddress, myCampaigns } from "../../blockchain-services/useCharityDonation"
 
 import { toast } from "react-toastify"
 
@@ -146,12 +146,6 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                                                 <p>
                                                     <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
                                                 </p>
-                                                <div className="card-actions justify-end">
-                                                    <div className=" justify-end">
-                                                        <button className="btn btn-warning btn-sm mx-1">Refund</button>
-                                                        <button className="btn btn-error btn-sm">Cancel</button>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     )

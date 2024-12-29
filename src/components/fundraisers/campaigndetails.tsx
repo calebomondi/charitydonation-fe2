@@ -7,7 +7,7 @@ import { viewCampaignDetails } from "../../blockchain-services/useCharityDonatio
 import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import { useState, useEffect } from "react"
 
-import { _web3, getBalanceAndAddress } from "../../blockchain-services/useCharityDonation"
+import { _web3, getBalanceAndAddress, refundDonors, cancelCampaign } from "../../blockchain-services/useCharityDonation"
 
 import { toast } from "react-toastify"
 
@@ -17,6 +17,7 @@ export default function CampaignDetails() {
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
     const [admin, setAdmin] = useState<string>('')
+    const [isLoading,setIsLoading] = useState<boolean>(false)
 
     const [searchParams] = useSearchParams();
     //get individual params
@@ -101,6 +102,30 @@ export default function CampaignDetails() {
         return data
     }
 
+    //cancel
+    const cancel = async (id:number,address:string) => {
+        setIsLoading(true)
+        try {
+            await cancelCampaign(id,address)
+        } catch (error) {
+            console.log(`cancel error=> ${error}`)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    //refund
+    const refund = async (id:number,address:string) => {
+        setIsLoading(true)
+        try {
+            await refundDonors(id,address)
+        } catch (error) {
+            console.log(`refund error=> ${error}`)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
   return (
     <main className="h-screen">
       <NavBar />
@@ -142,8 +167,8 @@ export default function CampaignDetails() {
                                             _web3.utils.toChecksumAddress(admin) === _web3.utils.toChecksumAddress(campaign.campaignAddress) ? (
                                                 <div className="grid place-items-center mt-5">
                                                     <div className="">
-                                                        <button className="btn btn-warning btn-sm mx-1">Refund</button>
-                                                        <button className="btn btn-error btn-sm">Cancel</button>
+                                                        <button className="btn btn-warning btn-sm mx-1" onClick={async () => await refund(Number(campaign.campaign_id),campaign.campaignAddress)}>{isLoading ? (<span className="loading loading-ring loading-xs"></span>) : 'Refund'}</button>
+                                                        <button className="btn btn-error btn-sm" onClick={async () => await cancel(Number(campaign.campaign_id),campaign.campaignAddress)}>{isLoading ? (<span className="loading loading-ring loading-xs"></span>) : 'Cancel'}</button>
                                                     </div>
                                                 </div>
                                             ) : (
