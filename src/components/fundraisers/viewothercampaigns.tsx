@@ -31,7 +31,7 @@ export default function ViewOtherCampaigns() {
             }, 1000)
         }
         fetchData()
-    },[])
+    })
 
     //filter campaigns only get active one 
     const filterCampaigns = (unfilteredCampaigns: CombinedCampaignData[]): CombinedCampaignData[] => {

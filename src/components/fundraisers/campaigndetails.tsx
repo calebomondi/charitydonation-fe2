@@ -7,7 +7,7 @@ import { viewCampaignDetails } from "../../blockchain-services/useCharityDonatio
 import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import { useState, useEffect } from "react"
 
-import { _web3 } from "../../blockchain-services/useCharityDonation"
+import { _web3, getBalanceAndAddress } from "../../blockchain-services/useCharityDonation"
 
 import { toast } from "react-toastify"
 
@@ -16,6 +16,7 @@ import { supabase } from "../../supabase/supabaseClient"
 export default function CampaignDetails() {
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
+    const [admin, setAdmin] = useState<string>('')
 
     const [searchParams] = useSearchParams();
     //get individual params
@@ -31,9 +32,21 @@ export default function CampaignDetails() {
                 const details = await combinedData()
                 setCombined(details)
             }, 1000)
+            //check if admin
+            await checkIfAdmin()
         }
         fetchData()
     })
+
+    //check if admin
+    const checkIfAdmin = async () => {
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+        setAdmin(account)
+    }
 
     //get campaign images
     const fetchCampaignImages = async () => {
@@ -125,9 +138,20 @@ export default function CampaignDetails() {
                                                 <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
                                             </p>
                                         </div>
-                                        <div className="grid place-items-center mt-5">
-                                            <button className="btn btn-success text-white btn-sm mx-1">Donate</button>
-                                        </div>
+                                        {
+                                            _web3.utils.toChecksumAddress(admin) === _web3.utils.toChecksumAddress(campaign.campaignAddress) ? (
+                                                <div className="grid place-items-center mt-5">
+                                                    <div className="">
+                                                        <button className="btn btn-warning btn-sm mx-1">Refund</button>
+                                                        <button className="btn btn-error btn-sm">Cancel</button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="grid place-items-center mt-5">
+                                                    <button className="btn btn-success text-white btn-sm mx-1">Donate</button>
+                                                </div>
+                                            )
+                                        }
                                     </div>
                                 </div>
                             </div>

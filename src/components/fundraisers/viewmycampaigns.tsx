@@ -106,7 +106,7 @@ export default function ViewMyCampaigns({status}:{status:string}) {
     });
 
     setTimeout(() =>{
-    setCombined(combinedData)
+        setCombined(combinedData)
     },1000)
 
   return (

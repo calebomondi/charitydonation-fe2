@@ -1,6 +1,7 @@
 import { contractABI, contractADDR } from "./core"; 
 import Web3 from "web3";
 import { CampaignDataArgs, CreateCampaignArgs } from "../types";
+import { toast } from "react-toastify";
 
 //For Events (Alchemy)
 const _provider = new Web3.providers.WebsocketProvider('wss://eth-sepolia.g.alchemy.com/v2/sZ5I9vk5LlS9LZTeLFjkQ8CJ3bAnTthd');
@@ -137,7 +138,14 @@ export const createCampaign = async ({title, description, target, durationDays} 
         //create campaign
         const tx = await contract.methods
         .createCampaign(title, description, BigInt(targetWei), BigInt(durationDays))
-        .send({ from: account })
+        .send(
+            { 
+                from: account, 
+                gas: await contract.methods
+                    .createCampaign(title, description, BigInt(targetWei), BigInt(durationDays))
+                    .estimateGas({ from: account }).toString()
+            }
+        )
 
         console.log(`txn: ${tx.blockHash}`)
 
@@ -173,7 +181,14 @@ export const addAdmin = async (admin:string) => {
         //create campaign
         const tx = await contract.methods
         .addCampaignAdmin(admin)
-        .send({ from: account })
+        .send(
+            { 
+                from: account, 
+                gas: await contract.methods
+                    .addCampaignAdmin(admin)
+                    .estimateGas({ from: account }).toString()
+            }
+        )
 
         console.log(`txn-add-admin: ${tx.transactionHash}`)
 
@@ -205,7 +220,14 @@ export const removeAdmin = async (admin:string) => {
         //create campaign
         const tx = await contract.methods
         .removeCampaignAdmin(admin)
-        .send({ from: account })
+        .send(
+            { 
+                from: account,
+                gas: await contract.methods
+                    .removeCampaignAdmin(admin)
+                    .estimateGas({ from: account }).toString()
+            }
+        )
 
         console.log(`txn-remove-admin: ${tx.transactionHash}`)
 
@@ -237,7 +259,14 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
         //cancel campaign
         const tx = await contract.methods
         .cancelCampaign(BigInt(campaignId),campaignAddress)
-        .send({ from: account })
+        .send(
+            { 
+                from: account,
+                gas: await contract.methods
+                .cancelCampaign(BigInt(campaignId), campaignAddress)
+                .estimateGas({ from: account }).toString()
+            }
+        )
 
         console.log(`txn-cancel-campaign: ${tx.transactionHash}`)
 
@@ -255,7 +284,7 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
             throw new Error("Transaction rejected by user");
         }
   
-        console.error("Failed to add campaign admin:", error);
+        console.error("Failed To Cancel Campaign:", error);
         throw new Error("Failed to add campaign admin: " + error.message);
     }
 }
@@ -335,5 +364,198 @@ export const viewCampaignDetails = async (id:number, address:string) : Promise<{
             number:0,
             donors:[]
         }
+    }
+}
+
+//refund donors
+export const refundDonors = async (campaignId:number,campaignAddress:string) => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        //cancel campaign
+        const tx = await contract.methods
+        .refundDonors(BigInt(campaignId),campaignAddress)
+        .send(
+            { 
+                from: account,
+                gas: await contract.methods
+                .refundDonors(BigInt(campaignId), campaignAddress)
+                .estimateGas({ from: account }).toString()
+            }
+        )
+
+        console.log(`txn-cancel-campaign: ${tx.transactionHash}`)
+
+    } catch (error:any) {
+        // Known error cases from smart contract
+        const CONTRACT_ERRORS = {
+            'This Campaign Is Successful Cannot be Cancelled!': 'Campaign is successful and cannot be cancelled',
+            'Insufficient contract balance': 'Contract has insufficient balance for refund',
+            'Transfer failed': 'Failed to transfer refund to donor',
+            'Refund Was Unsuccessful!': 'Refund process failed to complete'
+        };
+    
+        // Handle MetaMask/wallet errors
+        if (error.code === 4001) {
+            throw new Error('Transaction rejected by user');
+        }
+    
+        // Check for known contract errors
+        for (const [errorMsg, userMsg] of Object.entries(CONTRACT_ERRORS)) {
+            if (error.message.includes(errorMsg)) {
+                toast.error(userMsg)
+                throw new Error(userMsg);
+            }
+        }
+  
+        console.error("Failed To Refund Donors:", error);
+        toast.error("Failed To Refund Donors")
+        throw new Error("Failed To Refund Donors:" + error.message);
+    }
+}
+
+//donate to campaign
+export const donateToCampaign = async (campaignId:number,campaignAddress:string,amount:number) => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account, balanceEth } = balanceAndAddress;
+
+        // Check if user has sufficient balance
+        const userBalance = parseFloat(balanceEth);
+        if (userBalance < amount) {
+            toast.error('Insufficient balance in wallet');
+            throw new Error('Insufficient balance for donation');
+        }
+
+        //convert amount to wei
+        const amountInWei = BigInt(amount * 1e18)
+
+        // Estimate gas for the transaction
+        const gasEstimate = await contract.methods
+        .donateToCampaign(campaignAddress, BigInt(campaignId), amountInWei)
+        .estimateGas({ 
+            from: account,
+            value: amountInWei.toString()
+        });
+
+        //cancel campaign
+        const tx = await contract.methods
+        .donateToCampaign(campaignAddress,BigInt(campaignId),amountInWei)
+        .send({ 
+            from: account,
+            value: amountInWei.toString(),
+            gas: Math.floor(Number(gasEstimate) * 1.1).toString() // Add 10% buffer to gas estimate
+        });
+
+        console.log(`txn-cancel-campaign: ${tx.transactionHash}`)
+
+    } catch (error:any) {
+        // Known error cases from smart contract
+        const CONTRACT_ERRORS = {
+            "Donation Amount Cannot be Zero": "Donation Amount Cannot be Zero",
+            "The Amount And Value Don't Match!": "The Amount And Value Don't Match!"
+        };
+    
+        // Handle MetaMask/wallet errors
+        if (error.code === 4001) {
+            toast.error('Transaction cancelled');
+            throw new Error('Transaction rejected by user');
+        }
+    
+        // Check for known contract errors
+        for (const [errorMsg, userMsg] of Object.entries(CONTRACT_ERRORS)) {
+            if (error.message.includes(errorMsg)) {
+                toast.error(userMsg)
+                throw new Error(userMsg);
+            }
+        }
+  
+        console.error("Failed To Donate To Fundraiser:", error);
+        toast.error("Failed To Donate To Fundraiser")
+        throw new Error("Failed To Donate To Fundraiser:" + error.message);
+    }
+}
+
+//donate to campaign
+export const withdrawFromCampaign = async (campaignId:number,campaignAddress:string,amount:number,recipientAddress:string) => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        //convert amount to wei
+        const amountInWei = BigInt(amount * 1e18)
+
+        // Check campaign status before proceeding
+        const campaign: CampaignDataArgs = await contract.methods.campaigns(campaignAddress, campaignId - 1).call();
+        if (!campaign.isCompleted) {
+            toast.error('Campaign must be completed before withdrawal');
+            throw new Error('Campaign is still active');
+        }
+
+         // Estimate gas for the transaction
+        const gasEstimate = await contract.methods
+        .withdrawFunds(
+            BigInt(campaignId),
+            campaignAddress,
+            amountInWei,
+            recipientAddress
+        )
+        .estimateGas({ from: account });
+
+        // Send the withdrawal transaction
+        const tx = await contract.methods
+        .withdrawFunds(
+            BigInt(campaignId),
+            campaignAddress,
+            amountInWei,
+            recipientAddress
+        )
+        .send({ 
+            from: account,
+            gas: Math.floor(Number(gasEstimate) * 1.1).toString() // Add 10% buffer to gas estimate
+        });
+
+        console.log(`txn-cancel-campaign: ${tx.transactionHash}`)
+
+    } catch (error:any) {
+        // Known error cases from smart contract
+        const CONTRACT_ERRORS = {
+            "You Can't Withdraw Funds from an Active Campaign": 'Campaign must be completed before withdrawal',
+            "Insufficient contract balance": 'Not enough funds in the contract',
+            "Amount Cannot be Zero Or Exceed The Raised Amount!": 'Invalid withdrawal amount',
+            "Transfer failed": 'Failed to transfer funds',
+            "Not an admin": 'You do not have permission to withdraw funds'
+        };
+    
+        // Handle MetaMask/wallet errors
+        if (error.code === 4001) {
+            toast.error('Transaction cancelled');
+            throw new Error('Transaction rejected by user');
+        }
+    
+        // Check for known contract errors
+        for (const [errorMsg, userMsg] of Object.entries(CONTRACT_ERRORS)) {
+            if (error.message.includes(errorMsg)) {
+                toast.error(userMsg)
+                throw new Error(userMsg);
+            }
+        }
+  
+        console.error("Failed To Process Withdrawal:", error);
+        toast.error("Failed To Process Withdrawal")
+        throw new Error("Failed To Process Withdrawal:" + error.message);
     }
 }
