@@ -4,6 +4,7 @@ import Donate from '../donations/donate';
 import MyDonations from '../donations/mydonations';
 import MyFundraisers from '../fundraisers/myfundraisers';
 import Fundraisers from '../fundraisers/fundraisers';
+import CampaignDetails from '../fundraisers/campaigndetails';
 
 
 const AuthenticatedApp: React.FC = () => {
@@ -29,6 +30,10 @@ const AuthenticatedApp: React.FC = () => {
             <Route
                 path="/my-fundraisers"
                 element={<MyFundraisers />}
+            />
+            <Route
+                path="/campaign-details"
+                element={<CampaignDetails />}
             />
         </Routes>
     );

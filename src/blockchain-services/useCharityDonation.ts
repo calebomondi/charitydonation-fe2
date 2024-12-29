@@ -322,8 +322,6 @@ export const viewCampaignDetails = async (id:number, address:string) : Promise<{
         .getCampaignDetails(id,address)
         .call()
 
-        console.log(`number-> ${Number(result[1])}`)
-
         return {
             details: result[0] || {},  // Campaign details
             number: Number(result[1]) || 0,  // Convert donor count to number

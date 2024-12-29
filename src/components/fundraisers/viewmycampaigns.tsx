@@ -33,13 +33,13 @@ export default function ViewMyCampaigns({status}:{status:string}) {
     const filterCampaigns = (status:string, unfilteredCampaigns: CampaignDataArgs[]): CampaignDataArgs[] => {
         let filteredCampaigns:CampaignDataArgs[] = []
 
-        if (status === 'active') {
+        if (status === 'Active') {
             filteredCampaigns = unfilteredCampaigns.filter(campaign => !campaign.isCompleted && !campaign.isCancelled)
         }
-        if (status === 'completed') {
+        if (status === 'Completed') {
             filteredCampaigns = unfilteredCampaigns.filter(campaign => campaign.isCompleted)
         }
-        if (status === 'cancelled') {
+        if (status === 'Cancelled') {
             filteredCampaigns = unfilteredCampaigns.filter(campaign => campaign.isCancelled)
         }
 
@@ -154,7 +154,7 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                 </div>
             ) : (
                 <div className="text-green-400 p-2 m-2 h-1/3 grid place-items-center">
-                    <p className="p-1 text-lg font-semibold mt-10 text-center">There Are No Campaigns Under This Category!</p>
+                    <p className="p-1 text-lg font-semibold mt-10 text-center">You Have No {status} Fundraisers Yet!</p>
                     <span className="loading loading-dots loading-lg"></span>
                 </div>
             )

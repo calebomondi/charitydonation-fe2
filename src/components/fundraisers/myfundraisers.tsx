@@ -215,7 +215,7 @@ export default function MyFundraisers() {
               creating ? (
                 <div className="w-full bg-green-600 bg-opacity-60 h-dvh grid place-items-center">
                   <div className="flex justify-center items-center flex-col p-1 bg-black bg-opacity-50 rounded-xl">
-                    <span className="text-lg font-mono">Working on you fundraiser</span> <span className="loading loading-infinity loading-lg"></span>
+                    <span className="text-lg font-mono">Working on your fundraiser</span> <span className="loading loading-infinity loading-lg"></span>
                   </div>
                 </div>
               ) : (
@@ -229,13 +229,13 @@ export default function MyFundraisers() {
         viewAdmin && (<AdminManagement />)
       }
       {
-        viewActive && (<ViewMyCampaigns status="active" />)
+        viewActive && (<ViewMyCampaigns status="Active" />)
       } 
       {
-        viewCompleted && (<ViewMyCampaigns status="completed" />)
+        viewCompleted && (<ViewMyCampaigns status="Completed" />)
       } 
       {
-        viewCancelled && (<ViewMyCampaigns status="cancelled" />)
+        viewCancelled && (<ViewMyCampaigns status="Cancelled" />)
       } 
     </div>
   )

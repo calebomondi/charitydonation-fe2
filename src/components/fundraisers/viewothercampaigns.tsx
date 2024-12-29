@@ -2,6 +2,7 @@ import { viewCampaignDetails } from "../../blockchain-services/useCharityDonatio
 
 import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { _web3 } from "../../blockchain-services/useCharityDonation"
 
@@ -12,6 +13,12 @@ import { supabase } from "../../supabase/supabaseClient"
 export default function ViewOtherCampaigns() {
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
+
+    const navigate = useNavigate()
+
+    const handleRedirect = (id:string,address:string) => {
+        navigate(`/campaign-details?address=${address}&id=${id}`);
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,6 +55,7 @@ export default function ViewOtherCampaigns() {
         }
     };
 
+    //combine db and sm data
     const combinedData = async () : Promise<CombinedCampaignData[]> => {
         const data = await Promise.all(campaignImages.map(async (campaign) => {
             //get campaign data
@@ -76,8 +84,6 @@ export default function ViewOtherCampaigns() {
         return data
     }
 
-    console.log(`combined -> ${combined.length}`)
-
   return (
     <div>
         {
@@ -85,7 +91,7 @@ export default function ViewOtherCampaigns() {
                 <div className="m-1 p-1 flex flex-wrap justify-center items-center">
                     {
                         combined.map(campaign => (
-                            <div className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-xl m-1">
+                            <div onClick={() => handleRedirect(campaign.campaign_id.toString(),campaign.campaignAddress.toString())} className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-xl m-1 hover:cursor-pointer">
                                 <figure className="max-h-60">
                                     <img
                                     src={campaign.imageUrl || ''}
@@ -115,9 +121,11 @@ export default function ViewOtherCampaigns() {
                     }
                 </div>
             ) : (
-                <div className="flex flex-col mt-50">
-                    <span>Loading Fundaraisers</span>
-
+                <div className="flex flex-col m-52 p-5">
+                    <div className="text-green-600 flex flex-col justify-center items-center">
+                        <span className="text-xl font-semibold">Loading Fundaraisers</span>
+                        <span className="loading loading-infinity loading-lg"></span>
+                    </div>
                 </div>
             )
         }
