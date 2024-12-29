@@ -111,7 +111,7 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                             <>
                                 {
                                     campaign.imageUrl && (
-                                        <div className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-xl m-1">
+                                        <div className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:shadow-green-600 hover:shadow-sm transition duration-300">
                                             <figure className="max-h-60">
                                                 <img
                                                 src={campaign.imageUrl || ''}

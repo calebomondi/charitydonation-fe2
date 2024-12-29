@@ -26,12 +26,20 @@ export default function ViewOtherCampaigns() {
             await fetchCampaignImages()
             //fetch campaign details
             setTimeout( async () => {
-                const details = await combinedData()
+                const details = filterCampaigns(await combinedData())
                 setCombined(details)
             }, 1000)
         }
         fetchData()
     })
+
+    //filter campaigns only get active one 
+    const filterCampaigns = (unfilteredCampaigns: CombinedCampaignData[]): CombinedCampaignData[] => {
+        let filteredCampaigns = unfilteredCampaigns.filter(
+            campaign => !campaign.isCompleted && !campaign.isCancelled
+        )
+        return filteredCampaigns
+    }
 
     //get campaign images
     const fetchCampaignImages = async () => {
@@ -91,7 +99,7 @@ export default function ViewOtherCampaigns() {
                 <div className="m-1 p-1 flex flex-wrap justify-center items-center">
                     {
                         combined.map(campaign => (
-                            <div onClick={() => handleRedirect(campaign.campaign_id.toString(),campaign.campaignAddress.toString())} className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-xl m-1 hover:cursor-pointer">
+                            <div onClick={() => handleRedirect(campaign.campaign_id.toString(),campaign.campaignAddress.toString())} className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:cursor-pointer hover:shadow-green-600 hover:shadow-sm transition duration-300">
                                 <figure className="max-h-60">
                                     <img
                                     src={campaign.imageUrl || ''}
