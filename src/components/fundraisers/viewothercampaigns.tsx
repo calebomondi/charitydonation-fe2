@@ -31,7 +31,7 @@ export default function ViewOtherCampaigns() {
             }, 1000)
         }
         fetchData()
-    })
+    },[])
 
     //filter campaigns only get active one 
     const filterCampaigns = (unfilteredCampaigns: CombinedCampaignData[]): CombinedCampaignData[] => {
@@ -108,8 +108,8 @@ export default function ViewOtherCampaigns() {
                                 />
                                 </figure>
                                 <div className="card-body">
-                                    <h2 className="text-2xl font-semibold w-full truncate">{campaign.title}</h2>
-                                    <p className="truncate w-full text-lg">
+                                    <h2 className="text-xl font-semibold w-full line-clamp-2">{campaign.title}</h2>
+                                    <p className="line-clamp-2 w-full text-base">
                                         {campaign.description}
                                     </p>
                                     <div className="flex">
@@ -129,7 +129,7 @@ export default function ViewOtherCampaigns() {
                     }
                 </div>
             ) : (
-                <div className="flex flex-col m-52 p-5">
+                <div className="p-5 grid place-items-center h-screen">
                     <div className="text-green-600 flex flex-col justify-center items-center">
                         <span className="text-xl font-semibold">Loading Fundaraisers</span>
                         <span className="loading loading-infinity loading-lg"></span>

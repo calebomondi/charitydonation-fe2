@@ -89,22 +89,53 @@ export default function CampaignDetails() {
     }
 
   return (
-    <>
+    <main className="h-screen">
       <NavBar />
-      <div>
+      <div className="p-1 h-4/5 grid place-items-center">
         {
             combined.length > 0 ? (
-                <div>
+                <div className="w-full">
                     {
                         combined.map(campaign => (
-                            <div>
-                                {campaign.title}
+                            <div className="flex flex-col md:flex-row h-full m-1 rounded-lg border border-green-600 shadow-xl">
+                                <div className="md:w-1/2 grid place-items-center p-1">
+                                    <img 
+                                        src={campaign?.imageUrl || ''} 
+                                        alt="" 
+                                        className="md:max-h-96 md:w-3/4 rounded-lg"
+                                    />
+                                </div>
+                                <div className="md:w-1/2 grid place-items-center">
+                                    <div className="p-2">
+                                        <h2 className="font-semibold text-2xl text-center">{campaign.title}</h2>
+                                        <p className="text-lg text-center p-1">{campaign.description}</p>
+                                        <div className="flex justify-evenly p-1">
+                                            <p className="">
+                                                <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
+                                            </p>
+                                            <p className="">
+                                                <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
+                                        </div>
+                                        <div>
+                                            <p className="text-center">
+                                                <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
+                                            </p>
+                                        </div>
+                                        <div className="grid place-items-center mt-5">
+                                            <button className="btn btn-success text-white btn-sm mx-1">Donate</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         ))
                     }
                 </div>
             ) : (
-                <div className="flex flex-col m-52 p-5">
+                <div className="p-5 grid place-items-center h-screen">
                     <div className="text-green-600 flex flex-col justify-center items-center">
                         <span className="text-xl font-semibold">Loading Fundaraiser</span>
                         <span className="loading loading-infinity loading-lg"></span>
@@ -113,6 +144,6 @@ export default function CampaignDetails() {
             )
         }
       </div>
-    </>
+    </main>
   )
 }

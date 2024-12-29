@@ -2,6 +2,8 @@ import { myCampaigns } from "../../blockchain-services/useCharityDonation"
 import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import { useState, useEffect } from "react"
 
+import { useNavigate } from "react-router-dom"
+
 import { _web3 } from "../../blockchain-services/useCharityDonation"
 
 import { getBalanceAndAddress } from "../../blockchain-services/useCharityDonation"
@@ -14,6 +16,12 @@ export default function ViewMyCampaigns({status}:{status:string}) {
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [campaigns, setCampaigns] = useState<CampaignDataArgs[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
+
+    const navigate = useNavigate()
+
+    const handleRedirect = (id:string,address:string) => {
+        navigate(`/campaign-details?address=${address}&id=${id}`);
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -111,7 +119,7 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                             <>
                                 {
                                     campaign.imageUrl && (
-                                        <div className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:shadow-green-600 hover:shadow-sm transition duration-300">
+                                        <div className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:shadow-green-600 hover:shadow-sm transition duration-300 hover:cursor-pointer" onClick={() => handleRedirect(campaign.campaign_id.toString(),campaign.campaignAddress.toString())}>
                                             <figure className="max-h-60">
                                                 <img
                                                 src={campaign.imageUrl || ''}
@@ -120,8 +128,8 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                                             />
                                             </figure>
                                             <div className="card-body">
-                                                <h2 className="text-2xl font-semibold w-full truncate">{campaign.title}</h2>
-                                                <p className="truncate w-full text-lg">
+                                                <h2 className="text-xl font-semibold w-full line-clamp-2">{campaign.title}</h2>
+                                                <p className="line-clamp-2 w-full text-base">
                                                     {campaign.description}
                                                 </p>
                                                 <div className="flex">
