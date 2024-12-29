@@ -4,7 +4,7 @@ import { CampaignDataArgs, CreateCampaignArgs } from "../types";
 
 //For Events (Alchemy)
 const _provider = new Web3.providers.WebsocketProvider('wss://eth-sepolia.g.alchemy.com/v2/sZ5I9vk5LlS9LZTeLFjkQ8CJ3bAnTthd');
-const _web3 = new Web3(_provider);
+export const _web3 = new Web3(_provider);
 export const _contract = new _web3.eth.Contract(contractABI, contractADDR);
 
 //For Transactions (MetaMask)
@@ -159,24 +159,6 @@ export const createCampaign = async ({title, description, target, durationDays} 
         throw new Error("Failed to create campaign: " + error.message);
     }
 }
-
-/*
-export const listenToCampaignEvents = () => {
-    //listen for event
-    const subscription = _contract.events.CampaignCreated();
-    subscription.on('data', (event) => {
-        console.log(`Created Campaign ==> ${event.returnValues}`);
-        //upload to DB
-    });
-    subscription.on('error', console.error);
-
-    // Return unsubscribe function
-    return () => {
-        subscription.unsubscribe();
-    }
-    
-}
-*/
 
 //add admin
 export const addAdmin = async (admin:string) => {

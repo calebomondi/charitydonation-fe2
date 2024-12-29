@@ -82,7 +82,6 @@ export default function MyFundraisers() {
 
           } catch (error) {
             console.log('Failed To Upload Image: ',error)
-            toast.error('Failed To Upload Image!')
             setCreating(false)
           }
         }
