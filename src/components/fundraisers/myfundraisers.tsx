@@ -242,11 +242,21 @@ export default function MyFundraisers() {
           <>
             {
               creating ? (
-                <div className="w-full bg-green-600 bg-opacity-60 h-dvh grid place-items-center">
-                  <div className="flex justify-center items-center flex-col p-1 bg-black bg-opacity-50 rounded-xl">
-                    <span className="text-lg font-mono">Working on your fundraiser</span> <span className="loading loading-infinity loading-lg"></span>
+                <>
+                {/*
+                  <div className="w-full bg-green-600 bg-opacity-60 h-dvh grid place-items-center">
+                    <div className="flex justify-center items-center flex-col p-1 bg-black bg-opacity-50 rounded-xl">
+                      <span className="text-lg font-mono">Working on your fundraiser</span> <span className="loading loading-infinity loading-lg"></span>
+                    </div>
                   </div>
-                </div>
+                */}
+                  <dialog id="my_modal_6" className="modal modal-bottom sm:modal-middle">
+                    <div className="modal-box text-green-600">
+                        <h3 className="font-semibold text-lg">Working on your fundraiser</h3>
+                        <p className="py-4 text-center"><span className="loading loading-infinity loading-lg"></span></p>
+                    </div>
+                  </dialog>
+                </>
               ) : (
                 <CreateForm />
               )

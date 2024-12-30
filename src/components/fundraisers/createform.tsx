@@ -123,7 +123,7 @@ export default function CreateForm() {
                     />
                 </label>
                 <div className="w-full m-1 font-semibold text-green-600">
-                    <span>Image Upload</span> <span className="italic text-sm">(1080x1080)</span>
+                    <span>Image Upload</span> <span className="italic text-sm">(1000x1000)</span>
                 </div>
                 <input 
                     type="file" 
