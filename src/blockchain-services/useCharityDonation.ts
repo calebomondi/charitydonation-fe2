@@ -113,18 +113,7 @@ export const myCampaigns = async () : Promise<CampaignDataArgs[]> => {
 
 //create campaign
 export const createCampaign = async ({title, description, target, durationDays} : CreateCampaignArgs) => {
-    try {
-        //validate input data
-        if (!title || !description || !target || !durationDays) {
-            throw new Error('All fields are required')
-        }
-        if (isNaN(Number(target)) || Number(target) <= 0) {
-            throw new Error('Target must be a number and greater than 0')
-        }
-        if (isNaN(Number(durationDays)) || Number(durationDays) <= 0) {
-            throw new Error('Duration must be a number and greater than 0')
-        }
-    
+    try {    
         //convert ether to wei
         const targetWei = web3.utils.toWei(target,'ether');
 

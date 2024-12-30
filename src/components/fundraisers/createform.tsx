@@ -2,6 +2,8 @@ import { createCampaign } from "../../blockchain-services/useCharityDonation"
 import React, { useRef, useState } from "react"
 import { CreateCampaignArgs } from "../../types";
 
+import { toast } from "react-toastify";
+
 export default function CreateForm() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -43,15 +45,24 @@ export default function CreateForm() {
 
         setIsLoading(true)
         try {
+            //validate input data
+            if (isNaN(Number(formValues.target)) || Number(formValues.target) <= 0) {
+                throw new Error('Target must be a number and greater than 0')
+            }
+            if (isNaN(Number(formValues.durationDays)) || Number(formValues.durationDays) <= 0) {
+                throw new Error('Duration must be a number and greater than 0')
+            }
+
             await createCampaign(
                 {
                     title: formValues.title,
                     description: formValues.description, 
-                    target: formValues.target, 
-                    durationDays: formValues.durationDays
+                    target: formValues.target.toString(), 
+                    durationDays: formValues.durationDays.toString()
                 }
             );
         } catch (error:any) {
+            toast.error(`${error}`)
             console.error("Failed to create campaign:", error.message);
         } finally {
             setIsLoading(false)
@@ -130,6 +141,7 @@ export default function CreateForm() {
                     accept="image/*"
                     onChange={handleImageChange}
                     className="file-input file-input-bordered w-full" 
+                    required
                 />
                 {/*Preview Selected Image */}
                 {

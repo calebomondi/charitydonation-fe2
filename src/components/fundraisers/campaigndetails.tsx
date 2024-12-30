@@ -6,7 +6,7 @@ import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { _contract, _web3, getBalanceAndAddress, refundDonors, cancelCampaign, donateToCampaign, viewCampaignDetails } from "../../blockchain-services/useCharityDonation"
+import { _contract, _web3, getBalanceAndAddress, refundDonors, cancelCampaign, donateToCampaign, viewCampaignDetails, withdrawFromCampaign } from "../../blockchain-services/useCharityDonation"
 import { ContractLogsSubscription } from "web3-eth-contract"
 
 import { toast } from "react-toastify"
@@ -14,13 +14,18 @@ import { toast } from "react-toastify"
 import { supabase } from "../../supabase/supabaseClient"
 
 export default function CampaignDetails() {
+    //storage
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
     const [admin, setAdmin] = useState<string>('')
+    //progress
     const [isCancelling,setIsCancelling] = useState<boolean>(false)
     const [isRefunding,setIsRefunding] = useState<boolean>(false)
     const [isGiving,setIsGiving] = useState<boolean>(false)
+    const [isSending,setIsSending] = useState<boolean>(false)
+    //form values
     const [formValue, setFormValue] = useState<{amount: string}>({amount : ''})
+    const [formValueW, setFormValueW] = useState<{recipient:string, amount: string}>({recipient: '', amount : ''})
 
     const navigate = useNavigate()
 
@@ -193,12 +198,16 @@ export default function CampaignDetails() {
     }
 
     //handlechange
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setFormValue((prevValues) => ({
             ...prevValues,
             [name]: value,
         }))
+    }
+    const handleWithdrawalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormValueW((prevValues) => ({...prevValues, [name]: value}))
     }
 
     //handle donate
@@ -214,9 +223,35 @@ export default function CampaignDetails() {
             await donateToCampaign(id,address,Number(formValue.amount))
         } catch (error) {
             console.error(`Error When Donating: ${error}`)
+            toast.error(`${error}`)
         } finally {
             setFormValue({amount : ''})
             setIsGiving(false)
+        }
+    }
+
+    //handle withdraw
+    const handleWithdrawal = async (e: React.FormEvent) => {
+        e.preventDefault()
+       
+        setIsSending(true)
+        try {
+            //validate
+            if(isNaN(Number(formValueW.amount))) throw Error("Amount To Donate Should Be A Number!")
+            if(Number(formValueW.amount) <= 0) throw Error("Amount To Donate Should Be Greater Than Zero!")
+            if(!_web3.utils.isAddress(formValueW.recipient)) throw Error("Enter A Valid Ethereum Address!")
+            //get id and address
+            const id = Number(combined[0].campaign_id)
+            const address = combined[0].campaignAddress
+
+            await withdrawFromCampaign(id,address,Number(formValueW.amount),formValueW.recipient)
+
+        } catch (error) {
+            console.error(`Error When Donating: ${error}`)
+            toast.error(`${error}`)
+        } finally {
+            setFormValueW({recipient: '', amount : ''})
+            setIsSending(false)
         }
     }
 
@@ -253,9 +288,17 @@ export default function CampaignDetails() {
                                             <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
                                         </div>
                                         <div>
-                                            <p className="text-center">
-                                                <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
-                                            </p>
+                                            {
+                                                campaign.isCompleted ? (
+                                                    <p className="text-center">
+                                                        <span className="font-semibold text-base">Balance: </span><span>{_web3.utils.fromWei(campaign.balance,'ether')} sETH</span>
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-center">
+                                                        <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
+                                                    </p>
+                                                )
+                                            }
                                         </div>
                                         {
                                             _web3.utils.toChecksumAddress(admin) === _web3.utils.toChecksumAddress(campaign.campaignAddress) ? (
@@ -313,22 +356,71 @@ export default function CampaignDetails() {
                                                                         </div>
                                                                     </dialog>
                                                                 </>
-                                                                {/*
-                                                                <button className="btn btn-warning btn-sm mx-1" onClick={async () => await refund()}>{isRefunding ? (<span className="loading loading-ring loading-xs"></span>) : 'Refund'}</button>
-                                                                <button className="btn btn-error btn-sm" onClick={async () => await cancel()}>{isCancelling ? (<span className="loading loading-ring loading-xs"></span>) : 'Cancel'}</button>
-                                                                    */}
                                                             </div>
                                                         ) : (
                                                             campaign.isCompleted ? (
                                                                 <div className="grid place-items-center mt-5">
-                                                                    <button className="btn btn-success text-white btn-sm mx-1">Withdraw</button>
+                                                                    <button 
+                                                                        className="btn btn-success text-white btn-sm mx-1" 
+                                                                        onClick={()=>{
+                                                                            const modal = document.getElementById('my_modal_9');
+                                                                            if (modal) {
+                                                                                (modal as HTMLDialogElement).showModal();
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        Transact
+                                                                    </button>
+                                                                    <dialog id="my_modal_9" className="modal">
+                                                                        <div className="modal-box">
+                                                                            <form method="dialog">
+                                                                            {/* if there is a button in form, it will close the modal */}
+                                                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                                            </form>
+                                                                            <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Distribute To Benefeciary</h3>
+                                                                            <div>
+                                                                                <form onSubmit={handleWithdrawal} className="flex flex-col justify-center items-center p-1">
+                                                                                    <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                                                                                        Recipient
+                                                                                        <input 
+                                                                                            type="text" 
+                                                                                            id="recipient"
+                                                                                            name="recipient"
+                                                                                            value={formValueW.recipient}
+                                                                                            onChange={handleWithdrawalChange}
+                                                                                            className="md:w-5/6 p-2 text-white" 
+                                                                                            placeholder="Address" 
+                                                                                            required
+                                                                                        />
+                                                                                    </label>
+                                                                                    <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                                                                                        Amount
+                                                                                        <input 
+                                                                                            type="text" 
+                                                                                            id="amount"
+                                                                                            name="amount"
+                                                                                            value={formValueW.amount}
+                                                                                            onChange={handleWithdrawalChange}
+                                                                                            className="md:w-5/6 p-2 text-white" 
+                                                                                            placeholder="In ETH" 
+                                                                                            required
+                                                                                        />
+                                                                                    </label>
+                                                                                    <div className="mt-2 w-full grid place-items-center">
+                                                                                        <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
+                                                                                            {isSending ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Send'}
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            </div>
+                                                                        </div>
+                                                                    </dialog>
                                                                 </div>
                                                             ) : (
                                                                 <p className="text-center text-base text-red-600">No Action Here As This Fundraiser Was Cancelled!</p>
                                                             )
                                                         )
                                                     }
-                                                
                                                 </div>
                                             ) : (
                                                 <div className="grid place-items-center mt-5">
@@ -362,7 +454,7 @@ export default function CampaignDetails() {
                                                                     </label>
                                                                     <div className="mt-2 w-full grid place-items-center">
                                                                         <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
-                                                                            {isGiving ? (<span className="loading loading-ring loading-xs"></span>) : 'Give'}
+                                                                            {isGiving ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Give'}
                                                                         </button>
                                                                     </div>
                                                                 </form>

@@ -1,5 +1,7 @@
 import { addAdmin, removeAdmin } from "../../blockchain-services/useCharityDonation"
 import React, { useState } from "react"
+import { toast } from "react-toastify"
+import { _web3 } from "../../blockchain-services/useCharityDonation"
 import ViewCampaignAdmins from "./viewcampaignadmins"
 
 export default function AdminManagement() {
@@ -20,10 +22,14 @@ export default function AdminManagement() {
     
     setIsAdding(true)
     try {
+      //validate
+      if(!_web3.utils.isAddress(formValue.address)) throw Error("Enter A Valid Ethereum Address!")
+
       await addAdmin(formValue.address)
       setIsAdding(false)
     } catch (error) {
       console.error(`Error When Adding Admin ${error}`)
+      toast.error(`${error}`)
     } finally {
       setFormValue({address: ''})
       setIsAdding(false)
@@ -34,10 +40,15 @@ export default function AdminManagement() {
     e.preventDefault()
     
     setIsRemoving(true)
+
     try {
-      await removeAdmin('0xC099f8A2C5117C81652A506aFfE10a6E77e79808')
+      //validate
+      if(!_web3.utils.isAddress(formValue.address)) throw Error("Enter A Valid Ethereum Address!")
+
+      await removeAdmin(formValue.address)
       setIsRemoving(false)
     } catch (error) {
+      toast.error(`${error}`)
       console.error(`Error When Removing Admin ${error}`)
     } finally {
       setFormValue({address: ''})
