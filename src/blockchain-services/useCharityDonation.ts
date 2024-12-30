@@ -347,10 +347,16 @@ export const viewCampaignDetails = async (id:number, address:string) : Promise<{
         .getCampaignDetails(id,address)
         .call()
 
+        // Transform the donors array to handle Web3.js array structure
+        const donors: CampaignDonors[] = result[2].map((donor: any) => ({
+            address: donor[0] || donor.by, // Try both array and object notation
+            amount: BigInt(donor[1] || donor.amount || '0') // Convert to BigInt safely
+        }));
+
         return {
             details: result[0] || {},  // Campaign details
             number: Number(result[1]) || 0,  // Convert donor count to number
-            donors: result[2] || []  // Donors array
+            donors: donors
         };
         
     } catch (error) {

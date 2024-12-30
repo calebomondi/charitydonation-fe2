@@ -31,7 +31,7 @@ export default function ViewOtherCampaigns() {
             }, 1000)
         }
         fetchData()
-    })
+    },[])
 
     //filter campaigns only get active one 
     const filterCampaigns = (unfilteredCampaigns: CombinedCampaignData[]): CombinedCampaignData[] => {
@@ -56,6 +56,8 @@ export default function ViewOtherCampaigns() {
             }
 
             setCampaignImages(data)
+
+            console.log(`==> data ==> ${data}`)
 
         } catch (error) {
             console.log(`Could Not Load Images From DataBase: ${error}`)
@@ -91,7 +93,7 @@ export default function ViewOtherCampaigns() {
 
         return data
     }
-
+    
   return (
     <div>
         {

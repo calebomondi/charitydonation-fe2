@@ -5,7 +5,7 @@ export default function MyDonations() {
     <>
       <NavBar />
       <div>
-        oiiii!
+        zuk
       </div>
     </>
   )
