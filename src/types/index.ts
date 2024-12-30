@@ -38,3 +38,8 @@ export interface CombinedCampaignData extends CampaignDataArgs {
     endDate: string;
     progress: string;
 }
+
+export interface CampaignDonors {
+    address: string;
+    amount: bigint;
+}

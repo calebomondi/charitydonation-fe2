@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom"
 
 import NavBar from "../navbar/navbar"
 
-import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
+import { CampaignDataArgs, ImageUrls, CombinedCampaignData, CampaignDonors } from "../../types"
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -18,6 +18,7 @@ export default function CampaignDetails() {
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
     const [admin, setAdmin] = useState<string>('')
+    const [campaignDonors,setCampaignDonors] = useState<CampaignDonors[]>([])
     //progress
     const [isCancelling,setIsCancelling] = useState<boolean>(false)
     const [isRefunding,setIsRefunding] = useState<boolean>(false)
@@ -144,8 +145,8 @@ export default function CampaignDetails() {
 
             //destructure
             const { details } = thisCampaign as { details: CampaignDataArgs }
-            console.log(`url: ${campaign.url}`)
-            console.log(`details: ${details.title}`)
+            const { donors } = thisCampaign as {donors: CampaignDonors[]}
+            setCampaignDonors(donors)
             //add enddate
             const ts = Number(details.deadline) * 1000
             const deadline = new Date(ts).toLocaleDateString();
@@ -257,229 +258,246 @@ export default function CampaignDetails() {
 
   return (
     <main className="">
-      <NavBar />
-      <div className="p-1 h-4/5 grid place-items-center">
-        {
-            combined.length > 0 ? (
-                <div className="w-full">
-                    {
-                        combined.map(campaign => (
-                            <div className="flex flex-col md:flex-row h-full m-1 rounded-lg border border-green-600 shadow-xl">
-                                <div className="md:w-1/2 grid place-items-center p-1">
-                                    <img 
-                                        src={campaign?.imageUrl || ''} 
-                                        alt="" 
-                                        className="md:max-h-96 md:w-3/4 rounded-lg"
-                                    />
-                                </div>
-                                <div className="md:w-1/2 grid place-items-center">
-                                    <div className="p-2">
-                                        <h2 className="font-semibold text-2xl text-center">{campaign.title}</h2>
-                                        <p className="text-lg text-center p-1">{campaign.description}</p>
-                                        <div className="flex justify-evenly p-1">
-                                            <p className="text-center">
-                                                <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
-                                            </p>
-                                            <p className="text-center">
-                                                <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
-                                        </div>
-                                        <div>
-                                            {
-                                                campaign.isCompleted ? (
-                                                    <p className="text-center">
-                                                        <span className="font-semibold text-base">Balance: </span><span>{_web3.utils.fromWei(campaign.balance,'ether')} sETH</span>
-                                                    </p>
-                                                ) : (
-                                                    <p className="text-center">
-                                                        <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
-                                                    </p>
-                                                )
-                                            }
-                                        </div>
+    <NavBar />
+    <div className="p-1 h-4/5 grid place-items-center">
+    {
+        combined.length > 0 ? (
+            <div className="w-full">
+                {
+                    combined.map(campaign => (
+                        <div className="flex flex-col md:flex-row h-full m-1 rounded-lg border border-green-600 shadow-xl">
+                            <div className="md:w-1/2 grid place-items-center p-1">
+                                <img 
+                                    src={campaign?.imageUrl || ''} 
+                                    alt="" 
+                                    className="md:max-h-96 md:w-3/4 rounded-lg"
+                                />
+                            </div>
+                            <div className="md:w-1/2 grid place-items-center">
+                                <div className="p-2">
+                                    <h2 className="font-semibold text-2xl text-center">{campaign.title}</h2>
+                                    <p className="text-lg text-center p-1">{campaign.description}</p>
+                                    <div className="flex justify-evenly p-1">
+                                        <p className="text-center">
+                                            <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
+                                        </p>
+                                        <p className="text-center">
+                                            <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
+                                    </div>
+                                    <div>
                                         {
-                                            _web3.utils.toChecksumAddress(admin) === _web3.utils.toChecksumAddress(campaign.campaignAddress) ? (
-                                                <div className="grid place-items-center mt-5">
-                                                    {
-                                                        !campaign.isCancelled && !campaign.isCompleted ? (
-                                                            <div className="">
-                                                                <>
-                                                                    <button className="btn btn-warning btn-sm mx-1" 
-                                                                        onClick={()=>{
-                                                                            const modal = document.getElementById('my_modal_5');
-                                                                            if (modal) {
-                                                                                (modal as HTMLDialogElement).showModal();
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {isRefunding ? (<p className="text-center"><span>Refunding </span><span className="loading loading-ring loading-xs"></span></p>) : 'Refund'}
-                                                                    </button>
-                                                                    <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
-                                                                        <div className="modal-box">
-                                                                            <h3 className="font-semibold text-lg text-red-500">Disclaimer!</h3>
-                                                                            <p className="py-4">You Are About To Refund This Fundraiser's Donors, Proceed?</p>
-                                                                            <div className="modal-action">
+                                            campaign.isCompleted ? (
+                                                <p className="text-center">
+                                                    <span className="font-semibold text-base">Balance: </span><span>{_web3.utils.fromWei(campaign.balance,'ether')} sETH</span>
+                                                </p>
+                                            ) : (
+                                                <p className="text-center">
+                                                    <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
+                                                </p>
+                                            )
+                                        }
+                                    </div>
+                                    {
+                                        _web3.utils.toChecksumAddress(admin) === _web3.utils.toChecksumAddress(campaign.campaignAddress) ? (
+                                            <div className="grid place-items-center mt-5">
+                                                {
+                                                    !campaign.isCancelled && !campaign.isCompleted ? (
+                                                        <div className="">
+                                                            <>
+                                                                <button className="btn btn-warning btn-sm mx-1" 
+                                                                    onClick={()=>{
+                                                                        const modal = document.getElementById('my_modal_5');
+                                                                        if (modal) {
+                                                                            (modal as HTMLDialogElement).showModal();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {isRefunding ? (<p className="text-center"><span>Refunding </span><span className="loading loading-ring loading-xs"></span></p>) : 'Refund'}
+                                                                </button>
+                                                                <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+                                                                    <div className="modal-box">
+                                                                        <h3 className="font-semibold text-lg text-red-500">Disclaimer!</h3>
+                                                                        <p className="py-4">You Are About To Refund This Fundraiser's Donors, Proceed?</p>
+                                                                        <div className="modal-action">
+                                                                        <form method="dialog">
+                                                                            {/* if there is a button in form, it will close the modal */}
+                                                                            <button className="btn btn-sm btn-error m-1" onClick={async () => await refund()}>Yes</button>
+                                                                            <button className="btn btn-sm btn-success m-1">No</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                                </dialog>
+                                                            </>
+                                                            <>
+                                                                <button className="btn btn-error btn-sm" 
+                                                                    onClick={()=>{
+                                                                        const modal = document.getElementById('my_modal_6');
+                                                                        if (modal) {
+                                                                            (modal as HTMLDialogElement).showModal();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {isCancelling ? (<p className="text-center"><span>Cancelling </span><span className="loading loading-ring loading-xs"></span></p>) : 'Cancel'}
+                                                                </button>
+                                                                <dialog id="my_modal_6" className="modal modal-bottom sm:modal-middle">
+                                                                    <div className="modal-box">
+                                                                        <h3 className="font-semibold text-lg text-red-500">Disclaimer!</h3>
+                                                                        <p className="py-4">You Are About To Cancel This Fundraiser, Proceed?</p>
+                                                                        <div className="modal-action">
                                                                             <form method="dialog">
                                                                                 {/* if there is a button in form, it will close the modal */}
-                                                                                <button className="btn btn-sm btn-error m-1" onClick={async () => await refund()}>Yes</button>
+                                                                                <button className="btn btn-sm btn-error m-1" onClick={async () => await cancel()}>Yes</button>
                                                                                 <button className="btn btn-sm btn-success m-1">No</button>
                                                                             </form>
                                                                         </div>
                                                                     </div>
-                                                                    </dialog>
-                                                                </>
-                                                                <>
-                                                                    <button className="btn btn-error btn-sm" 
-                                                                        onClick={()=>{
-                                                                            const modal = document.getElementById('my_modal_6');
-                                                                            if (modal) {
-                                                                                (modal as HTMLDialogElement).showModal();
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {isCancelling ? (<p className="text-center"><span>Cancelling </span><span className="loading loading-ring loading-xs"></span></p>) : 'Cancel'}
-                                                                    </button>
-                                                                    <dialog id="my_modal_6" className="modal modal-bottom sm:modal-middle">
-                                                                        <div className="modal-box">
-                                                                            <h3 className="font-semibold text-lg text-red-500">Disclaimer!</h3>
-                                                                            <p className="py-4">You Are About To Cancel This Fundraiser, Proceed?</p>
-                                                                            <div className="modal-action">
-                                                                                <form method="dialog">
-                                                                                    {/* if there is a button in form, it will close the modal */}
-                                                                                    <button className="btn btn-sm btn-error m-1" onClick={async () => await cancel()}>Yes</button>
-                                                                                    <button className="btn btn-sm btn-success m-1">No</button>
-                                                                                </form>
-                                                                            </div>
+                                                                </dialog>
+                                                            </>
+                                                        </div>
+                                                    ) : (
+                                                        campaign.isCompleted ? (
+                                                            <div className="grid place-items-center mt-5">
+                                                                <button 
+                                                                    className="btn btn-success text-white btn-sm mx-1" 
+                                                                    onClick={()=>{
+                                                                        const modal = document.getElementById('my_modal_9');
+                                                                        if (modal) {
+                                                                            (modal as HTMLDialogElement).showModal();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Transact
+                                                                </button>
+                                                                <dialog id="my_modal_9" className="modal">
+                                                                    <div className="modal-box">
+                                                                        <form method="dialog">
+                                                                        {/* if there is a button in form, it will close the modal */}
+                                                                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                                        </form>
+                                                                        <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Distribute To Benefeciary</h3>
+                                                                        <div>
+                                                                            <form onSubmit={handleWithdrawal} className="flex flex-col justify-center items-center p-1">
+                                                                                <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                                                                                    Recipient
+                                                                                    <input 
+                                                                                        type="text" 
+                                                                                        id="recipient"
+                                                                                        name="recipient"
+                                                                                        value={formValueW.recipient}
+                                                                                        onChange={handleWithdrawalChange}
+                                                                                        className="md:w-5/6 p-2 text-white" 
+                                                                                        placeholder="Address" 
+                                                                                        required
+                                                                                    />
+                                                                                </label>
+                                                                                <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                                                                                    Amount
+                                                                                    <input 
+                                                                                        type="text" 
+                                                                                        id="amount"
+                                                                                        name="amount"
+                                                                                        value={formValueW.amount}
+                                                                                        onChange={handleWithdrawalChange}
+                                                                                        className="md:w-5/6 p-2 text-white" 
+                                                                                        placeholder="In ETH" 
+                                                                                        required
+                                                                                    />
+                                                                                </label>
+                                                                                <div className="mt-2 w-full grid place-items-center">
+                                                                                    <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
+                                                                                        {isSending ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Send'}
+                                                                                    </button>
+                                                                                </div>
+                                                                            </form>
                                                                         </div>
-                                                                    </dialog>
-                                                                </>
+                                                                    </div>
+                                                                </dialog>
                                                             </div>
                                                         ) : (
-                                                            campaign.isCompleted ? (
-                                                                <div className="grid place-items-center mt-5">
-                                                                    <button 
-                                                                        className="btn btn-success text-white btn-sm mx-1" 
-                                                                        onClick={()=>{
-                                                                            const modal = document.getElementById('my_modal_9');
-                                                                            if (modal) {
-                                                                                (modal as HTMLDialogElement).showModal();
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        Transact
-                                                                    </button>
-                                                                    <dialog id="my_modal_9" className="modal">
-                                                                        <div className="modal-box">
-                                                                            <form method="dialog">
-                                                                            {/* if there is a button in form, it will close the modal */}
-                                                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                                                                            </form>
-                                                                            <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Distribute To Benefeciary</h3>
-                                                                            <div>
-                                                                                <form onSubmit={handleWithdrawal} className="flex flex-col justify-center items-center p-1">
-                                                                                    <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
-                                                                                        Recipient
-                                                                                        <input 
-                                                                                            type="text" 
-                                                                                            id="recipient"
-                                                                                            name="recipient"
-                                                                                            value={formValueW.recipient}
-                                                                                            onChange={handleWithdrawalChange}
-                                                                                            className="md:w-5/6 p-2 text-white" 
-                                                                                            placeholder="Address" 
-                                                                                            required
-                                                                                        />
-                                                                                    </label>
-                                                                                    <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
-                                                                                        Amount
-                                                                                        <input 
-                                                                                            type="text" 
-                                                                                            id="amount"
-                                                                                            name="amount"
-                                                                                            value={formValueW.amount}
-                                                                                            onChange={handleWithdrawalChange}
-                                                                                            className="md:w-5/6 p-2 text-white" 
-                                                                                            placeholder="In ETH" 
-                                                                                            required
-                                                                                        />
-                                                                                    </label>
-                                                                                    <div className="mt-2 w-full grid place-items-center">
-                                                                                        <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
-                                                                                            {isSending ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Send'}
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </form>
-                                                                            </div>
-                                                                        </div>
-                                                                    </dialog>
-                                                                </div>
-                                                            ) : (
-                                                                <p className="text-center text-base text-red-600">No Action Here As This Fundraiser Was Cancelled!</p>
-                                                            )
+                                                            <p className="text-center text-base text-red-600">No Action Here As This Fundraiser Was Cancelled!</p>
                                                         )
+                                                    )
+                                                }
+                                            </div>
+                                        ) : (
+                                            <div className="grid place-items-center mt-5">
+                                                <button className="btn btn-success text-white btn-sm mx-1" onClick={()=>{
+                                                    const modal = document.getElementById('my_modal_3');
+                                                    if (modal) {
+                                                        (modal as HTMLDialogElement).showModal();
                                                     }
-                                                </div>
-                                            ) : (
-                                                <div className="grid place-items-center mt-5">
-                                                    <button className="btn btn-success text-white btn-sm mx-1" onClick={()=>{
-                                                        const modal = document.getElementById('my_modal_3');
-                                                        if (modal) {
-                                                            (modal as HTMLDialogElement).showModal();
-                                                        }
-                                                    }}>Donate</button>
-                                                    <dialog id="my_modal_3" className="modal">
-                                                        <div className="modal-box">
-                                                            <form method="dialog">
-                                                            {/* if there is a button in form, it will close the modal */}
-                                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                }}>Donate</button>
+                                                <dialog id="my_modal_3" className="modal">
+                                                    <div className="modal-box">
+                                                        <form method="dialog">
+                                                        {/* if there is a button in form, it will close the modal */}
+                                                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                                        </form>
+                                                        <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Sharing Is Caring</h3>
+                                                        <div>
+                                                            <form onSubmit={handleDonate} className="flex flex-col justify-center items-center p-1">
+                                                                <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                                                                    Amount
+                                                                    <input 
+                                                                        type="text" 
+                                                                        id="amount"
+                                                                        name="amount"
+                                                                        value={formValue.amount}
+                                                                        onChange={handleChange}
+                                                                        className="md:w-5/6 p-2 text-white" 
+                                                                        placeholder="In ETH" 
+                                                                        required
+                                                                    />
+                                                                </label>
+                                                                <div className="mt-2 w-full grid place-items-center">
+                                                                    <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
+                                                                        {isGiving ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Give'}
+                                                                    </button>
+                                                                </div>
                                                             </form>
-                                                            <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Sharing Is Caring</h3>
-                                                            <div>
-                                                                <form onSubmit={handleDonate} className="flex flex-col justify-center items-center p-1">
-                                                                    <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
-                                                                        Amount
-                                                                        <input 
-                                                                            type="text" 
-                                                                            id="amount"
-                                                                            name="amount"
-                                                                            value={formValue.amount}
-                                                                            onChange={handleChange}
-                                                                            className="md:w-5/6 p-2 text-white" 
-                                                                            placeholder="In ETH" 
-                                                                            required
-                                                                        />
-                                                                    </label>
-                                                                    <div className="mt-2 w-full grid place-items-center">
-                                                                        <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
-                                                                            {isGiving ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Give'}
-                                                                        </button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
                                                         </div>
-                                                    </dialog>
-                                                </div>
-                                            )
-                                        }
-                                    </div>
+                                                    </div>
+                                                </dialog>
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             </div>
-                        ))
-                    }
+                        </div>
+                    ))
+                }
+            </div>
+        ) : (
+            <div className="p-5 grid place-items-center h-screen">
+                <div className="text-green-600 flex flex-col justify-center items-center">
+                    <span className="text-xl font-semibold">Loading Fundaraiser</span>
+                    <span className="loading loading-infinity loading-lg"></span>
                 </div>
-            ) : (
-                <div className="p-5 grid place-items-center h-screen">
-                    <div className="text-green-600 flex flex-col justify-center items-center">
-                        <span className="text-xl font-semibold">Loading Fundaraiser</span>
-                        <span className="loading loading-infinity loading-lg"></span>
+            </div>
+        )
+    }
+    </div> 
+    <div className="p-1">
+        {campaignDonors.length > 0 && (
+            <>
+            <h2>Fundraiser Donors</h2>
+            <p><span>Total: </span><span>{campaignDonors.length}</span></p>
+            <div>
+                {campaignDonors.map((donor, index) => (
+                    <div key={index}>
+                        <p>
+                            <span>{index + 1}. </span><span>{donor.address.slice(0,6)}...{donor.address.slice(-5)} - {donor.amount.toString()}</span>
+                        </p>
                     </div>
-                </div>
-            )
-        }
-      </div> 
+                ))}
+            </div>
+            </>
+        )}
+    </div>
     </main>
   )
 }

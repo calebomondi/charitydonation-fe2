@@ -1,6 +1,6 @@
 import { contractABI, contractADDR } from "./core"; 
 import Web3 from "web3";
-import { CampaignDataArgs, CreateCampaignArgs } from "../types";
+import { CampaignDataArgs, CreateCampaignArgs, CampaignDonors } from "../types";
 import { toast } from "react-toastify";
 
 //For Events (Alchemy)
@@ -340,10 +340,10 @@ export const getCampaignAdmins = async () : Promise<string[]> => {
 }
 
 //View Campaign Details
-export const viewCampaignDetails = async (id:number, address:string) : Promise<{details:CampaignDataArgs | {}, number:number, donors:string[]}> => {
+export const viewCampaignDetails = async (id:number, address:string) : Promise<{details:CampaignDataArgs | {}, number:number, donors:CampaignDonors[]}> => {
     try {
         //get campaign details
-        const result: [CampaignDataArgs, string, string[]] = await contract.methods
+        const result: [CampaignDataArgs, string, CampaignDonors[]] = await contract.methods
         .getCampaignDetails(id,address)
         .call()
 
