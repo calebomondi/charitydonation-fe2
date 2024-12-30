@@ -109,6 +109,8 @@ export default function ViewMyCampaigns({status}:{status:string}) {
         setCombined(combinedData)
     },1000)
 
+    console.log(`combined111 -> ${combinedData}`)
+
   return (
     <div>
         {

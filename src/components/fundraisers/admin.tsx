@@ -123,16 +123,3 @@ export default function AdminManagement() {
     </div>
   )
 }
-
-/*
-<button className="btn btn-accent" onClick={handleAddAdmin}>
-        {
-          isAdding ? 'Adding ...' : 'Add Admin'
-        }
-      </button>
-      <button className="btn btn-success" onClick={handleRemoveAdmin}>
-        {
-          isRemoving ? 'Removing ...' : 'Remove Admin'
-        }
-      </button>
-*/
