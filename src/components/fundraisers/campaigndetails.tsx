@@ -17,7 +17,8 @@ export default function CampaignDetails() {
     const [campaignImages, setCampaignImages] = useState<ImageUrls[]>([])
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
     const [admin, setAdmin] = useState<string>('')
-    const [isLoading,setIsLoading] = useState<boolean>(false)
+    const [isCancelling,setIsCancelling] = useState<boolean>(false)
+    const [isRefunding,setIsRefunding] = useState<boolean>(false)
 
     const [searchParams] = useSearchParams();
     //get individual params
@@ -104,30 +105,30 @@ export default function CampaignDetails() {
 
     //cancel
     const cancel = async (id:number,address:string) => {
-        setIsLoading(true)
+        setIsCancelling(true)
         try {
             await cancelCampaign(id,address)
         } catch (error) {
             console.log(`cancel error=> ${error}`)
         } finally {
-            setIsLoading(false)
+            setIsCancelling(false)
         }
     }
 
     //refund
     const refund = async (id:number,address:string) => {
-        setIsLoading(true)
+        setIsRefunding(true)
         try {
             await refundDonors(id,address)
         } catch (error) {
             console.log(`refund error=> ${error}`)
         } finally {
-            setIsLoading(false)
+            setIsRefunding(false)
         }
     }
 
   return (
-    <main className="h-screen">
+    <main className="">
       <NavBar />
       <div className="p-1 h-4/5 grid place-items-center">
         {
@@ -148,10 +149,10 @@ export default function CampaignDetails() {
                                         <h2 className="font-semibold text-2xl text-center">{campaign.title}</h2>
                                         <p className="text-lg text-center p-1">{campaign.description}</p>
                                         <div className="flex justify-evenly p-1">
-                                            <p className="">
+                                            <p className="text-center">
                                                 <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
                                             </p>
-                                            <p className="">
+                                            <p className="text-center">
                                                 <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
                                             </p>
                                         </div>
@@ -166,10 +167,23 @@ export default function CampaignDetails() {
                                         {
                                             _web3.utils.toChecksumAddress(admin) === _web3.utils.toChecksumAddress(campaign.campaignAddress) ? (
                                                 <div className="grid place-items-center mt-5">
-                                                    <div className="">
-                                                        <button className="btn btn-warning btn-sm mx-1" onClick={async () => await refund(Number(campaign.campaign_id),campaign.campaignAddress)}>{isLoading ? (<span className="loading loading-ring loading-xs"></span>) : 'Refund'}</button>
-                                                        <button className="btn btn-error btn-sm" onClick={async () => await cancel(Number(campaign.campaign_id),campaign.campaignAddress)}>{isLoading ? (<span className="loading loading-ring loading-xs"></span>) : 'Cancel'}</button>
-                                                    </div>
+                                                    {
+                                                        !campaign.isCancelled && !campaign.isCompleted ? (
+                                                            <div className="">
+                                                                <button className="btn btn-warning btn-sm mx-1" onClick={async () => await refund(Number(campaign.campaign_id),campaign.campaignAddress)}>{isRefunding ? (<span className="loading loading-ring loading-xs"></span>) : 'Refund'}</button>
+                                                                <button className="btn btn-error btn-sm" onClick={async () => await cancel(Number(campaign.campaign_id),campaign.campaignAddress)}>{isCancelling ? (<span className="loading loading-ring loading-xs"></span>) : 'Cancel'}</button>
+                                                            </div>
+                                                        ) : (
+                                                            campaign.isCompleted ? (
+                                                                <div className="grid place-items-center mt-5">
+                                                                    <button className="btn btn-success text-white btn-sm mx-1">Withdraw</button>
+                                                                </div>
+                                                            ) : (
+                                                                <p className="text-center text-base text-red-600">No Action Here As This Fundraiser Was Cancelled!</p>
+                                                            )
+                                                        )
+                                                    }
+                                                
                                                 </div>
                                             ) : (
                                                 <div className="grid place-items-center mt-5">

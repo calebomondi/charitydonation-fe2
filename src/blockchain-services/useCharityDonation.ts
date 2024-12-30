@@ -140,10 +140,7 @@ export const createCampaign = async ({title, description, target, durationDays} 
         .createCampaign(title, description, BigInt(targetWei), BigInt(durationDays))
         .send(
             { 
-                from: account, 
-                gas: await contract.methods
-                    .createCampaign(title, description, BigInt(targetWei), BigInt(durationDays))
-                    .estimateGas({ from: account }).toString()
+                from: account
             }
         )
 
@@ -183,10 +180,7 @@ export const addAdmin = async (admin:string) => {
         .addCampaignAdmin(admin)
         .send(
             { 
-                from: account, 
-                gas: await contract.methods
-                    .addCampaignAdmin(admin)
-                    .estimateGas({ from: account }).toString()
+                from: account
             }
         )
 
@@ -222,10 +216,7 @@ export const removeAdmin = async (admin:string) => {
         .removeCampaignAdmin(admin)
         .send(
             { 
-                from: account,
-                gas: await contract.methods
-                    .removeCampaignAdmin(admin)
-                    .estimateGas({ from: account }).toString()
+                from: account
             }
         )
 
@@ -261,10 +252,7 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
         .cancelCampaign(BigInt(campaignId),campaignAddress)
         .send(
             { 
-                from: account,
-                gas: await contract.methods
-                .cancelCampaign(BigInt(campaignId), campaignAddress)
-                .estimateGas({ from: account }).toString()
+                from: account
             }
         )
 
@@ -391,10 +379,7 @@ export const refundDonors = async (campaignId:number,campaignAddress:string) => 
         .refundDonors(BigInt(campaignId),campaignAddress)
         .send(
             { 
-                from: account,
-                gas: await contract.methods
-                .refundDonors(BigInt(campaignId), campaignAddress)
-                .estimateGas({ from: account }).toString()
+                from: account
             }
         )
 
@@ -450,21 +435,12 @@ export const donateToCampaign = async (campaignId:number,campaignAddress:string,
         //convert amount to wei
         const amountInWei = BigInt(amount * 1e18)
 
-        // Estimate gas for the transaction
-        const gasEstimate = await contract.methods
-        .donateToCampaign(campaignAddress, BigInt(campaignId), amountInWei)
-        .estimateGas({ 
-            from: account,
-            value: amountInWei.toString()
-        });
-
         //cancel campaign
         const tx = await contract.methods
         .donateToCampaign(campaignAddress,BigInt(campaignId),amountInWei)
         .send({ 
             from: account,
-            value: amountInWei.toString(),
-            gas: Math.floor(Number(gasEstimate) * 1.1).toString() // Add 10% buffer to gas estimate
+            value: amountInWei.toString()
         });
 
         console.log(`txn-cancel-campaign: ${tx.transactionHash}`)
@@ -516,16 +492,6 @@ export const withdrawFromCampaign = async (campaignId:number,campaignAddress:str
             throw new Error('Campaign is still active');
         }
 
-         // Estimate gas for the transaction
-        const gasEstimate = await contract.methods
-        .withdrawFunds(
-            BigInt(campaignId),
-            campaignAddress,
-            amountInWei,
-            recipientAddress
-        )
-        .estimateGas({ from: account });
-
         // Send the withdrawal transaction
         const tx = await contract.methods
         .withdrawFunds(
@@ -535,8 +501,7 @@ export const withdrawFromCampaign = async (campaignId:number,campaignAddress:str
             recipientAddress
         )
         .send({ 
-            from: account,
-            gas: Math.floor(Number(gasEstimate) * 1.1).toString() // Add 10% buffer to gas estimate
+            from: account
         });
 
         console.log(`txn-cancel-campaign: ${tx.transactionHash}`)

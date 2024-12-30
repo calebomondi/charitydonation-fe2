@@ -99,32 +99,39 @@ export default function ViewOtherCampaigns() {
                 <div className="m-1 p-1 flex flex-wrap justify-center items-center">
                     {
                         combined.map(campaign => (
-                            <div onClick={() => handleRedirect(campaign.campaign_id.toString(),campaign.campaignAddress.toString())} className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:cursor-pointer hover:shadow-green-600 hover:shadow-sm transition duration-300">
-                                <figure className="max-h-60">
-                                    <img
-                                    src={campaign.imageUrl || ''}
-                                    alt="" 
-                                    className=""
-                                />
-                                </figure>
-                                <div className="card-body">
-                                    <h2 className="text-xl font-semibold w-full line-clamp-2">{campaign.title}</h2>
-                                    <p className="line-clamp-2 w-full text-base">
-                                        {campaign.description}
-                                    </p>
-                                    <div className="flex">
-                                        <p className="">
-                                            <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
-                                        </p>
-                                        <p className="">
-                                            <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
-                                    </div>                                    
-                                </div>
-                            </div>
+                            <>
+                                {
+                                    !campaign.isCancelled && !campaign.isCompleted && (
+                                        <div onClick={() => handleRedirect(campaign.campaign_id.toString(),campaign.campaignAddress.toString())} className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:cursor-pointer hover:shadow-green-600 hover:shadow-sm transition duration-300">
+                                            <figure className="max-h-60">
+                                                <img
+                                                src={campaign.imageUrl || ''}
+                                                alt="" 
+                                                className=""
+                                            />
+                                            </figure>
+                                            <div className="card-body">
+                                                <h2 className="text-xl font-semibold w-full line-clamp-2">{campaign.title}</h2>
+                                                <p className="line-clamp-2 w-full text-base">
+                                                    {campaign.description}
+                                                </p>
+                                                <div className="flex">
+                                                    <p className="text-center">
+                                                        <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
+                                                    </p>
+                                                    <p className="text-center">
+                                                        <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
+                                                </div>                                    
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            </>
+                            
                         ))
                     }
                 </div>

@@ -133,17 +133,17 @@ export default function ViewMyCampaigns({status}:{status:string}) {
                                                     {campaign.description}
                                                 </p>
                                                 <div className="flex">
-                                                    <p className="">
+                                                    <p className="text-center">
                                                         <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
                                                     </p>
-                                                    <p className="">
+                                                    <p className="text-center">
                                                         <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
                                                     </p>
                                                 </div>
                                                 <div>
                                                     <progress className="progress progress-success w-full" value={campaign.progress} max="100"></progress>
                                                 </div>
-                                                <p>
+                                                <p className="text-center">
                                                     <span className="font-semibold text-base">Deadline: </span><span>{campaign.endDate}</span>
                                                 </p>
                                             </div>
