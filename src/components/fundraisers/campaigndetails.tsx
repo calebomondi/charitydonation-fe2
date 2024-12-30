@@ -2,12 +2,12 @@ import { useSearchParams } from "react-router-dom"
 
 import NavBar from "../navbar/navbar"
 
-import { viewCampaignDetails } from "../../blockchain-services/useCharityDonation"
-
 import { CampaignDataArgs, ImageUrls, CombinedCampaignData } from "../../types"
 import React, { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
-import { _web3, getBalanceAndAddress, refundDonors, cancelCampaign, donateToCampaign } from "../../blockchain-services/useCharityDonation"
+import { _contract, _web3, getBalanceAndAddress, refundDonors, cancelCampaign, donateToCampaign, viewCampaignDetails } from "../../blockchain-services/useCharityDonation"
+import { ContractLogsSubscription } from "web3-eth-contract"
 
 import { toast } from "react-toastify"
 
@@ -21,6 +21,8 @@ export default function CampaignDetails() {
     const [isRefunding,setIsRefunding] = useState<boolean>(false)
     const [isGiving,setIsGiving] = useState<boolean>(false)
     const [formValue, setFormValue] = useState<{amount: string}>({amount : ''})
+
+    const navigate = useNavigate()
 
     const [searchParams] = useSearchParams();
     //get individual params
@@ -41,6 +43,59 @@ export default function CampaignDetails() {
         }
         fetchData()
     })
+
+    useEffect(() => {
+        //listen to multiple events
+        const subscriptions: ContractLogsSubscription[] = []
+    
+        //campaign cancelled event
+        const campaignCancelled = _contract.events.CampaignCancelled();
+        campaignCancelled.on('data', (event) => {
+            const id = event.returnValues.campaign_id
+            toast.success(`You Have Cancelled Fundraiser of ID ${id?.toString()}`)
+            //handle event
+            setTimeout(() => {
+                navigate("/my-fundraisers")
+            },1000)
+        });
+        campaignCancelled.on('error', console.error);
+        subscriptions.push(campaignCancelled)
+    
+        //donate event
+        const donateToCampaign = _contract.events.DonationReceived();
+        donateToCampaign.on('data', (event) => {
+          const amount = event.returnValues.amount as bigint
+          toast.success(`Received Donation of ${_web3.utils.fromWei(amount,'ether')} sETH, Thank You 🙂`)
+        });
+        donateToCampaign.on('error', console.error);
+        subscriptions.push(donateToCampaign)
+    
+        //withdraw event
+        const withdrawFromCampaign = _contract.events.FundsWithdrawn();
+        withdrawFromCampaign.on('data', (event) => {
+          const amount = event.returnValues.amount as bigint
+          const recipeint = event.returnValues.to as string
+          toast.success(`${_web3.utils.fromWei(amount,'ether')} Sent To ${recipeint.slice(0,6)}...${recipeint.slice(-4)}`)
+        });
+        withdrawFromCampaign.on('error', console.error);
+        subscriptions.push(withdrawFromCampaign)
+    
+        //refund donors event
+        const refundDonors = _contract.events.RefundCampaignDonors();
+        refundDonors.on('data', (event) => {
+          const amount = event.returnValues.amount as bigint
+          const recipeint = event.returnValues.to as string
+          toast.success(`Refunded Donor ${recipeint?.toString().slice(0,6)}...${recipeint?.toString().slice(-4)} Amount ${_web3.utils.fromWei(amount,'ether')} sETH`)
+        });
+        refundDonors.on('error', console.error);
+        subscriptions.push(refundDonors)
+    
+        //unsubscribe
+        return () => {
+          subscriptions.forEach(sub => sub.unsubscribe());
+        };
+    
+      },[_contract])
 
     //check if admin
     const checkIfAdmin = async () => {
@@ -217,7 +272,7 @@ export default function CampaignDetails() {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        {isRefunding ? (<span className="loading loading-ring loading-xs"></span>) : 'Refund'}
+                                                                        {isRefunding ? (<p className="text-center"><span>Refunding </span><span className="loading loading-ring loading-xs"></span></p>) : 'Refund'}
                                                                     </button>
                                                                     <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
                                                                         <div className="modal-box">
@@ -242,7 +297,7 @@ export default function CampaignDetails() {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        {isCancelling ? (<span className="loading loading-ring loading-xs"></span>) : 'Cancel'}
+                                                                        {isCancelling ? (<p className="text-center"><span>Cancelling </span><span className="loading loading-ring loading-xs"></span></p>) : 'Cancel'}
                                                                     </button>
                                                                     <dialog id="my_modal_6" className="modal modal-bottom sm:modal-middle">
                                                                         <div className="modal-box">
@@ -332,7 +387,7 @@ export default function CampaignDetails() {
                 </div>
             )
         }
-      </div>
+      </div> 
     </main>
   )
 }

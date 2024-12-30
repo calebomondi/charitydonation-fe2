@@ -6,6 +6,8 @@ import AdminManagement from "./admin"
 import { _contract, _web3 } from "../../blockchain-services/useCharityDonation"
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+
 import { ContractLogsSubscription } from "web3-eth-contract"
 
 import { supabase } from "../../supabase/supabaseClient"
@@ -21,6 +23,10 @@ export default function MyFundraisers() {
   const [viewCompleted, setViewCompleted] = useState<boolean>(false)
   const [viewCancelled, setViewCancelled] = useState<boolean>(false)
   const [viewActive, setViewActive] = useState<boolean>(true)
+  //toast display
+  //const [isShown, setIsShown] = useState<boolean>(false)
+  //navigate
+  const navigate = useNavigate()
 
   useEffect(() => {
     //listen to multiple events
@@ -80,6 +86,10 @@ export default function MyFundraisers() {
             //notify creator
             toast.success(`'${event.returnValues.title}' Fundraiser Was Created Successfully!`)
 
+            setTimeout(() => {
+              navigate("/my-fundraisers")
+            },1000)
+
           } catch (error) {
             console.log('Failed To Upload Image: ',error)
             setCreating(false)
@@ -88,16 +98,6 @@ export default function MyFundraisers() {
     });
     campaignCreated.on('error', console.error);
     subscriptions.push(campaignCreated)
-
-    //campaign cancelled event
-    const campaignCancelled = _contract.events.CampaignCancelled();
-    campaignCancelled.on('data', (event) => {
-        const id = event.returnValues.campaign_id
-        toast.success(`You Have Cancelled Fundraiser of ID ${id?.toString()}`)
-        //handle event
-    });
-    campaignCancelled.on('error', console.error);
-    subscriptions.push(campaignCancelled)
 
     //add admin event
     const addAdmin = _contract.events.AddAdmin();
@@ -116,35 +116,6 @@ export default function MyFundraisers() {
     });
     removeAdmin.on('error', console.error);
     subscriptions.push(removeAdmin)
-
-    //donate event
-    const donateToCampaign = _contract.events.DonationReceived();
-    donateToCampaign.on('data', (event) => {
-      const amount = event.returnValues.amount as bigint
-      toast.success(`Received Donation of ${_web3.utils.fromWei(amount,'ether')} sETH, Thank You 🙂`)
-    });
-    donateToCampaign.on('error', console.error);
-    subscriptions.push(donateToCampaign)
-
-    //withdraw event
-    const withdrawFromCampaign = _contract.events.FundsWithdrawn();
-    withdrawFromCampaign.on('data', (event) => {
-      const amount = event.returnValues.amount as bigint
-      const recipeint = event.returnValues.to as string
-      toast.success(`${_web3.utils.fromWei(amount,'ether')} Sent To ${recipeint.slice(0,6)}...${recipeint.slice(-4)}`)
-    });
-    withdrawFromCampaign.on('error', console.error);
-    subscriptions.push(withdrawFromCampaign)
-
-    //refund donors event
-    const refundDonors = _contract.events.RefundCampaignDonors();
-    refundDonors.on('data', (event) => {
-      const amount = event.returnValues.amount as bigint
-      const recipeint = event.returnValues.to as string
-      toast.success(`Refunded Donor ${recipeint?.toString().slice(0,6)}...${recipeint?.toString().slice(-4)} Amount ${_web3.utils.fromWei(amount,'ether')} sETH`)
-    });
-    refundDonors.on('error', console.error);
-    subscriptions.push(refundDonors)
 
     //unsubscribe
     return () => {

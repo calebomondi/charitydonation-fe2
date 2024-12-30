@@ -149,18 +149,22 @@ export const createCampaign = async ({title, description, target, durationDays} 
     } catch (error:any) {
         // Handle specific error cases
         if (error.message.includes("Campaign already exists")) {
+            toast.error("Campaign already exists")
             throw new Error(`Campaign "${title}" already exists`);
         }
         
         if (error.code === 4001) {
+            toast.error("Transaction Rejected By User")
             throw new Error("Transaction rejected by user");
         }
     
         if (error.message.includes("insufficient funds")) {
+            toast.error("Insufficient Funds For Transaction")
             throw new Error("Insufficient funds for transaction");
         }
   
         console.error("Failed to create campaign:", error);
+        toast.error("Failed To Create Campaign!")
         throw new Error("Failed to create campaign: " + error.message);
     }
 }
@@ -189,14 +193,17 @@ export const addAdmin = async (admin:string) => {
     } catch (error:any) {
         // Handle specific error cases
         if (error.message.includes("This Address Is Already An Admin!")) {
+            toast.error("This Address Is Already An Admin!")
             throw new Error("This Address Is Already An Admin!");
         }
         
         if (error.code === 4001) {
-            throw new Error("Transaction rejected by user");
+            toast.error("Transaction Rejected By User")
+            throw new Error("Transaction Rejected By User");
         }
   
         console.error("Failed to add campaign admin:", error);
+        toast.error("Failed To Add Admin")
         throw new Error("Failed to add campaign admin: " + error.message);
     }
 }
@@ -225,14 +232,17 @@ export const removeAdmin = async (admin:string) => {
     } catch (error:any) {
         // Handle specific error cases
         if (error.message.includes("This Address Is Not An Admin!")) {
+            toast.error("The Address Entered Is Not Admin!")
             throw new Error("This Address Is Already An Admin!");
         }
         
         if (error.code === 4001) {
+            toast.error("Transaction Rejected By User")
             throw new Error("Transaction rejected by user");
         }
   
         console.error("Failed to add campaign admin:", error);
+        toast.error("Failed To Remove Campaign Admin")
         throw new Error("Failed to add campaign admin: " + error.message);
     }
 }
@@ -276,7 +286,7 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
         }
         
         if (error.code === 4001) {
-            toast.error("Transanction Failed!")
+            toast.error("Transaction Rejected By User")
             throw new Error("Transaction rejected by user");
         }
   
