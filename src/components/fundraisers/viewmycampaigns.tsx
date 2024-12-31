@@ -9,6 +9,7 @@ import { supabase } from "../../supabase/supabaseClient"
 export default function ViewMyCampaigns({ status }: { status: string }) {
     const [isLoading, setIsLoading] = useState(true);
     const [combined, setCombined] = useState<CombinedCampaignData[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
     const handleRedirect = (id: string, address: string) => {
@@ -36,6 +37,17 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                 return campaigns;
         }
     }, [status]);
+
+    // Memoized search function
+    const filteredCampaigns = useMemo(() => {
+        if (!searchQuery.trim()) return combined;
+        
+        const query = searchQuery.toLowerCase();
+        return combined.filter(campaign => 
+            campaign.title.toLowerCase().includes(query) ||
+            campaign.description.toLowerCase().includes(query)
+        );
+    }, [combined, searchQuery]);
 
     // Combined fetch function
     const fetchAllData = async () => {
@@ -122,65 +134,85 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     }
 
     return (
-        <div className="m-1 p-1 flex flex-wrap justify-center items-center">
-            {combined.map(campaign => (
-                <>
-                    {campaign.imageUrl && (
-                        <div 
-                        key={`${campaign.campaignAddress}-${campaign.campaign_id}`}
-                        className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:shadow-green-600 hover:shadow-sm transition duration-300 hover:cursor-pointer"
-                        onClick={() => handleRedirect(
-                            campaign.campaign_id.toString(),
-                            campaign.campaignAddress.toString()
+        <div>
+            {/* Search Input */}
+            <div className="w-full max-w-md mx-auto mb-6">
+                <input
+                    type="text"
+                    placeholder="Search campaigns by title or description..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="input input-bordered w-full"
+                />
+            </div>
+
+            {/* Campaign Cards */}
+            <div className="m-1 p-1 flex flex-wrap justify-center items-center">
+                {filteredCampaigns.map(campaign => (
+                    <>
+                        {campaign.imageUrl && (
+                            <div 
+                                key={`${campaign.campaignAddress}-${campaign.campaign_id}`}
+                                className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:shadow-green-600 hover:shadow-sm transition duration-300 hover:cursor-pointer"
+                                onClick={() => handleRedirect(
+                                    campaign.campaign_id.toString(),
+                                    campaign.campaignAddress.toString()
+                                )}
+                            >
+                                <figure className="max-h-60">
+                                    <img
+                                        src={campaign.imageUrl}
+                                        alt={campaign.title}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
+                                </figure>
+                           
+                                <div className="card-body">
+                                    <h2 className="text-xl font-semibold w-full line-clamp-2">
+                                        {campaign.title}
+                                    </h2>
+                                    <p className="line-clamp-2 w-full text-base">
+                                        {campaign.description}
+                                    </p>
+                                    <div className="flex justify-between">
+                                        <p className="text-center">
+                                            <span className="font-semibold text-base">Target: </span>
+                                            <span className="font-mono">
+                                                {_web3.utils.fromWei(campaign.targetAmount, 'ether')}
+                                            </span> sETH
+                                        </p>
+                                        <p className="text-center">
+                                            <span className="font-semibold text-base">Raised: </span>
+                                            <span className="font-mono">
+                                                {_web3.utils.fromWei(campaign.raisedAmount, 'ether')}
+                                            </span> sETH
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <progress 
+                                            className="progress progress-success w-full"
+                                            value={campaign.progress}
+                                            max="100"
+                                        />
+                                    </div>
+                                    <p className="text-center">
+                                        <span className="font-semibold text-base">Deadline: </span>
+                                        <span>{campaign.endDate}</span>
+                                    </p>
+                                </div>
+                            </div>
                         )}
-                    >
-                            <figure className="max-h-60">
-                                <img
-                                    src={campaign.imageUrl}
-                                    alt={campaign.title}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                />
-                            </figure>
-                       
-                        <div className="card-body">
-                            <h2 className="text-xl font-semibold w-full line-clamp-2">
-                                {campaign.title}
-                            </h2>
-                            <p className="line-clamp-2 w-full text-base">
-                                {campaign.description}
-                            </p>
-                            <div className="flex justify-between">
-                                <p className="text-center">
-                                    <span className="font-semibold text-base">Target: </span>
-                                    <span className="font-mono">
-                                        {_web3.utils.fromWei(campaign.targetAmount, 'ether')}
-                                    </span> sETH
-                                </p>
-                                <p className="text-center">
-                                    <span className="font-semibold text-base">Raised: </span>
-                                    <span className="font-mono">
-                                        {_web3.utils.fromWei(campaign.raisedAmount, 'ether')}
-                                    </span> sETH
-                                </p>
-                            </div>
-                            <div>
-                                <progress 
-                                    className="progress progress-success w-full"
-                                    value={campaign.progress}
-                                    max="100"
-                                />
-                            </div>
-                            <p className="text-center">
-                                <span className="font-semibold text-base">Deadline: </span>
-                                <span>{campaign.endDate}</span>
-                            </p>
-                        </div>
-                    </div>
-                    )}
-                </>
-                
-            ))}
+                    </>
+                ))}
+            </div>
+
+            {/* No Results Message */}
+            {filteredCampaigns.length === 0 && searchQuery && (
+                <div className="text-green-400 p-2 m-2 text-center">
+                    <p className="text-lg">No campaigns found matching "{searchQuery}"</p>
+                </div>
+            )}
         </div>
     );
 }
