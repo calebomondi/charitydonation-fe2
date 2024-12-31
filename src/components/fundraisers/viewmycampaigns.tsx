@@ -137,13 +137,13 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
         <div>
             {/* Search Input */}
             <div className="w-full sticky top-16 z-50">
-                <div className="w-full p-2 m-2 grid place-items-center">
+                <div className="w-full p-2 mt-2 grid place-items-center">
                     <input
                         type="text"
                         placeholder="Search campaigns by title or address..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input input-bordered w-full md:w-1/2"
+                        className="input input-bordered w-full md:w-1/2 shadow-xl"
                     />
                 </div>
             </div>
