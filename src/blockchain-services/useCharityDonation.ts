@@ -586,12 +586,16 @@ export const getCampaignWithdrawals = async (campaignAddress: string): Promise<W
 
         const { withdrwals: withdrawalsList } = result;
 
-        // Validate the response
-        if (!Array.isArray(withdrawalsList)) {
-            throw new Error('Invalid withdrawals data structure');
-        }
+        // Transform the result to match our interface
+        const withdrawals: Withdrawal[] = withdrawalsList.map((withdrawal: any) => ({
+            campaignId: (withdrawal[0] || withdrawal.campaignId).toString(),
+            title: (withdrawal[1] || withdrawal.title || ''),
+            amount: (withdrawal[2] || withdrawal.amount || '').toString(),
+            by: withdrawal[3] || withdrawal.by || '',
+            to: withdrawal[4] || withdrawal.to || ''
+        }));
 
-        return withdrawalsList;
+        return withdrawals;
 
     } catch (error) {
         console.error("Failed to get campaign withdrawals:", error);

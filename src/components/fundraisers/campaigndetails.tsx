@@ -2,11 +2,11 @@ import { useSearchParams } from "react-router-dom"
 
 import NavBar from "../navbar/navbar"
 
-import { CampaignDataArgs, ImageUrls, CombinedCampaignData, CampaignDonors } from "../../types"
+import { CampaignDataArgs, ImageUrls, CombinedCampaignData, CampaignDonors, Withdrawal } from "../../types"
 import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { _contract, _web3, getBalanceAndAddress, refundDonors, cancelCampaign, donateToCampaign, viewCampaignDetails, withdrawFromCampaign } from "../../blockchain-services/useCharityDonation"
+import { _contract, _web3, getBalanceAndAddress, refundDonors, cancelCampaign, donateToCampaign, viewCampaignDetails, withdrawFromCampaign, getCampaignWithdrawals } from "../../blockchain-services/useCharityDonation"
 import { ContractLogsSubscription } from "web3-eth-contract"
 
 import { toast } from "react-toastify"
@@ -19,6 +19,7 @@ export default function CampaignDetails() {
     const [combined,setCombined] = useState<CombinedCampaignData[]>([])
     const [admin, setAdmin] = useState<string>('')
     const [campaignDonors,setCampaignDonors] = useState<CampaignDonors[]>([])
+    const [withdrawals,setWithdrawals] = useState<Withdrawal[]>([])
     //progress
     const [isCancelling,setIsCancelling] = useState<boolean>(false)
     const [isRefunding,setIsRefunding] = useState<boolean>(false)
@@ -27,7 +28,7 @@ export default function CampaignDetails() {
     //form values
     const [formValue, setFormValue] = useState<{amount: string}>({amount : ''})
     const [formValueW, setFormValueW] = useState<{recipient:string, amount: string}>({recipient: '', amount : ''})
-    
+
 
     const navigate = useNavigate()
 
@@ -48,7 +49,8 @@ export default function CampaignDetails() {
             //check if admin
             await checkIfAdmin()
             //get withdrawals
-
+            const data = await getCampaignWithdrawals(combined[0].campaignAddress)
+            fileteredWithdrawals(data)
         }
         fetchData()
     })
@@ -115,6 +117,14 @@ export default function CampaignDetails() {
         }
         const { account } = balanceAndAddress;
         setAdmin(account)
+    }
+
+    //filter this campaigns withdrawals
+    const fileteredWithdrawals = (data:Withdrawal[]) => {
+        const filtered = data.filter(
+            withdrawal => withdrawal.campaignId === combined[0].campaign_id.toString()
+        )
+        setWithdrawals(filtered)
     }
 
     //get campaign images
@@ -495,6 +505,21 @@ export default function CampaignDetails() {
                     {campaignDonors.map((donor, index) => (
                         <p className="m-1 w-auto" key={index}>
                             <span className="font-semibold">{index + 1}. </span><span>{donor.address?.slice(0,6)}...{donor.address?.slice(-5)}({_web3.utils.fromWei(donor.amount?.toString(),'ether')})</span>
+                        </p>
+                    ))}
+                </div>
+                </>
+            )}
+        </div>
+        <div className={`p-1 m-2 rounded-lg shadow-xl ${withdrawals.length > 0 && 'border border-green-600 '}`}>
+            {campaignDonors.length > 0 && combined[0].isCompleted && (
+                <>
+                <h2 className="text-center text-green-600 text-xl font-semibold m-1">Fundraiser Disbursements</h2>
+                <p className="text-center"><span className="font-semibold text-lg">Total: </span><span className="font-mono text-lg">{withdrawals.length}</span></p>
+                <div className="p-1 font-mono text-base flex flex-wrap justify-center items-center md:max-h-40 overflow-y-scroll h-auto max-h-80">
+                    {withdrawals.map((withdrawal, index) => (
+                        <p className="m-1 w-auto" key={index}>
+                            <span className="font-semibold">{index + 1}. </span><span>{withdrawal.to?.slice(0,6)}...{withdrawal.to?.slice(-5)}({_web3.utils.fromWei(withdrawal.amount?.toString(),'ether')})</span>
                         </p>
                     ))}
                 </div>
