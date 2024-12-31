@@ -286,7 +286,7 @@ export const cancelCampaign = async (campaignId:number,campaignAddress:string) =
 }
 
 //check if admin is active
-const isActiveAdmin = async (admin:string,campaignAddress:string) : Promise<boolean> => {
+export const isActiveAdmin = async (admin:string,campaignAddress:string) : Promise<boolean> => {
     try {
         const isActive:boolean = await contract.methods.admins(campaignAddress, admin).call();
         return isActive;

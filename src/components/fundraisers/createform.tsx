@@ -15,13 +15,30 @@ export default function CreateForm() {
         durationDays: ''
     })
 
+    const TITLE_WORD_LIMIT = 10;
+    const DESCRIPTION_WORD_LIMIT = 100;
+
+    const countWords = (text: string): number => {
+        return text.trim() ? text.trim().split(/\s+/).length : 0;
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {name, value} = e.target;
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            [name]: value,
-        }))
-    }
+        const { name, value } = e.target;
+        
+        if (name === 'title') {
+            const words = countWords(value);
+            if (words <= TITLE_WORD_LIMIT || value.length < formValues.title.length) {
+                setFormValues(prev => ({ ...prev, [name]: value }));
+            }
+        } else if (name === 'description') {
+            const words = countWords(value);
+            if (words <= DESCRIPTION_WORD_LIMIT || value.length < formValues.description.length) {
+                setFormValues(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setFormValues(prev => ({ ...prev, [name]: value }));
+        }
+    };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -79,34 +96,46 @@ export default function CreateForm() {
         }
     }
 
+    const remainingTitleWords = TITLE_WORD_LIMIT - countWords(formValues.title);
+    const remainingDescriptionWords = DESCRIPTION_WORD_LIMIT - countWords(formValues.description);
+
   return (
     <div className="flex justify-center items-center">
         <div className="md:w-1/2 m-2 p-2 border border-green-700  flex flex-col justify-center items-center rounded-lg">
             <h2 className="text-center text-lg font-semibold">Create New Fundraiser</h2>
             <form onSubmit={handleSubmit} className="w-full p-1">
-                <label className="input input-bordered flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
-                    Title
-                    <input 
-                        type="text" 
-                        id="title"
-                        name="title"
-                        value={formValues.title}
+                <div className="mb-2">
+                    <label className="input input-bordered flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
+                        Title
+                        <input 
+                            type="text" 
+                            id="title"
+                            name="title"
+                            value={formValues.title}
+                            onChange={handleChange}
+                            className="md:w-5/6 p-2 text-white" 
+                            placeholder="Fundraiser Name" 
+                            required
+                        />
+                    </label>
+                    <div className={`text-sm ${remainingTitleWords < 3 ? 'text-red-500' : 'text-gray-500'} text-right`}>
+                        {remainingTitleWords} words remaining
+                    </div>
+                </div>
+                <div className="mb-2">
+                    <textarea
+                        placeholder="Fundraiser description"
+                        className="textarea textarea-bordered textarea-sm w-full"
+                        id="description"
+                        name="description"
+                        value={formValues.description}
                         onChange={handleChange}
-                        className="md:w-5/6 p-2 text-white" 
-                        placeholder="Fundraiser Name" 
                         required
                     />
-                </label>
-                <textarea
-                    placeholder="Fundraiser descritption"
-                    className="textarea textarea-bordered textarea-sm w-full"
-                    id="description"
-                    name="description"
-                    value={formValues.description}
-                    onChange={handleChange}
-                    required
-                >
-                </textarea>
+                    <div className={`text-sm ${remainingDescriptionWords < 10 ? 'text-red-500' : 'text-gray-500'} text-right`}>
+                        {remainingDescriptionWords} words remaining
+                    </div>
+                </div>
                 <label className="input input-bordered flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
                     Target
                     <input 

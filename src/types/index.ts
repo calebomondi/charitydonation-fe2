@@ -39,6 +39,13 @@ export interface CombinedCampaignData extends CampaignDataArgs {
     progress: string;
 }
 
+export interface CombinedCampaignDataX extends CampaignDataArgs {
+    imageUrl: string | null;
+    endDate: string;
+    progress: string;
+    campaignKey: string;
+}
+
 export interface CampaignDonors {
     address: string;
     amount: bigint;

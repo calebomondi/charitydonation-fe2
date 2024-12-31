@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { myDonations } from '../../blockchain-services/useCharityDonation';
 import { Donation } from '../../types';
 
@@ -7,6 +8,12 @@ const DonationsTable = () => {
     const [donations, setDonations] = useState<Donation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const navigate = useNavigate()
+
+    const handleRedirect = (id: string, address: string) => {
+        navigate(`/campaign-details?address=${address}&id=${id}`);
+    }
 
     useEffect(() => {
         fetchDonations();
@@ -57,13 +64,13 @@ const DonationsTable = () => {
                             <thead className="sticky top-0 bg-green-700">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                        Campaign Title
+                                        Fundraiser
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                        Campaign ID
+                                        ID
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                        Campaign Address
+                                        Address
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-white uppercase tracking-wider">
                                         Amount (ETH)
@@ -76,7 +83,8 @@ const DonationsTable = () => {
                                     donations.map((donation, index) => (
                                         <tr 
                                             key={`${donation.campaignAddress}-${donation.campaignId}-${index}`}
-                                            className="hover:bg-gray-50 transition-colors duration-200"
+                                            className="hover:bg-gray-200 hover:cursor-pointer transition-colors duration-200"
+                                            onClick={() => handleRedirect(donation.campaignId.toString(),donation.campaignAddress)}
                                         >
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-semibold ">
                                                 {donation.title}

@@ -1,14 +1,14 @@
-import { CampaignDataArgs, CombinedCampaignData } from "../../types"
+import { CampaignDataArgs, CombinedCampaignDataX } from "../../types"
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { _web3 } from "../../blockchain-services/useCharityDonation"
-import { getBalanceAndAddress, myCampaigns } from "../../blockchain-services/useCharityDonation"
+import { getBalanceAndAddress, myCampaigns, viewCampaignDetails, isActiveAdmin } from "../../blockchain-services/useCharityDonation"
 import { toast } from "react-toastify"
 import { supabase } from "../../supabase/supabaseClient"
 
 export default function ViewMyCampaigns({ status }: { status: string }) {
     const [isLoading, setIsLoading] = useState(true);
-    const [combined, setCombined] = useState<CombinedCampaignData[]>([]);
+    const [combined, setCombined] = useState<CombinedCampaignDataX[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
@@ -20,6 +20,27 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     const filterCampaigns = useMemo(() => (
         campaigns: CampaignDataArgs[]
     ): CampaignDataArgs[] => {
+        switch (status) {
+            case 'Active':
+                return campaigns.filter(campaign => 
+                    !campaign.isCompleted && !campaign.isCancelled
+                );
+            case 'Completed':
+                return campaigns.filter(campaign => 
+                    campaign.isCompleted
+                );
+            case 'Cancelled':
+                return campaigns.filter(campaign => 
+                    campaign.isCancelled
+                );
+            default:
+                return campaigns;
+        }
+    }, [status]);
+
+    const filterCampaignsAdmin = useMemo(() => (
+        campaigns: CombinedCampaignDataX[]
+    ): CombinedCampaignDataX[] => {
         switch (status) {
             case 'Active':
                 return campaigns.filter(campaign => 
@@ -53,15 +74,13 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     const fetchAllData = async () => {
         try {
             setIsLoading(true);
-
-            // Get user account
             const balanceAndAddress = await getBalanceAndAddress();
             if (!balanceAndAddress) {
                 throw new Error('Failed to get balance and address');
             }
             const { account } = balanceAndAddress;
 
-            // Parallel fetch of campaigns and images
+            // Fetch owned campaigns
             const [campaigns, { data: imageData, error: imageError }] = await Promise.all([
                 myCampaigns(),
                 supabase
@@ -74,11 +93,8 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                 throw new Error(`Error fetching images: ${imageError.message}`);
             }
 
-            // Filter campaigns based on status
             const filteredCampaigns = filterCampaigns(campaigns);
-
-            // Combine campaign and image data
-            const combinedData = filteredCampaigns.map((campaign) => {
+            const ownedCampaigns = filteredCampaigns.map((campaign) => {
                 const image = imageData?.find(
                     (img) => img.frid === Number(campaign.campaign_id)
                 );
@@ -95,11 +111,66 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                     ...campaign,
                     imageUrl: image?.url || null,
                     endDate: deadline,
-                    progress: progress.toString()
+                    progress: progress.toString(),
+                    campaignKey: `${campaign.campaignAddress}-${campaign.campaign_id}` // Add unique key
                 };
             });
 
-            setCombined(combinedData);
+            // Fetch admin campaigns
+            const { data: allImageData } = await supabase.from('unduguimages').select('*');
+            const adminCampaignsPromises = allImageData?.map(async (campaign) => {
+                try {
+                    const amAnAdmin = await isActiveAdmin(account, campaign.fraddress);
+                    if (amAnAdmin) {
+                        const thisCampaign = await viewCampaignDetails(campaign.frid, campaign.fraddress);
+                        const { details } = thisCampaign as { details: CampaignDataArgs };
+
+                        const deadline = new Date(Number(details.deadline) * 1000).toLocaleDateString();
+                        const progress = Math.round(
+                            Number(details.raisedAmount * BigInt(100) / details.targetAmount)
+                        );
+
+                        return {
+                            ...details,
+                            imageUrl: campaign?.url || null,
+                            endDate: deadline,
+                            progress: progress.toString(),
+                            campaignKey: `${details.campaignAddress}-${details.campaign_id}` // Add unique key
+                        };
+                    }
+                    return null;
+                } catch (error) {
+                    console.error(`Error fetching campaign ${campaign.frid}:`, error);
+                    return null;
+                }
+            }) || [];
+
+            const adminCampaigns = (await Promise.all(adminCampaignsPromises))
+                .filter((campaign): campaign is CombinedCampaignDataX => 
+                    campaign !== null && campaign !== undefined
+                );
+
+            const filteredAdminCampaigns = filterCampaignsAdmin(adminCampaigns);
+
+            // Combine campaigns using the unique campaignKey
+            const campaignMap = new Map<string, CombinedCampaignDataX>();
+            
+            // Add owned campaigns to map
+            ownedCampaigns.forEach(campaign => {
+                campaignMap.set(campaign.campaignKey, campaign);
+            });
+
+            // Add admin campaigns to map
+            filteredAdminCampaigns.forEach(campaign => {
+                if (!campaignMap.has(campaign.campaignKey)) {
+                    campaignMap.set(campaign.campaignKey, campaign);
+                }
+            });
+
+            // Convert map values back to array
+            const mergedCampaigns = Array.from(campaignMap.values());
+            setCombined(mergedCampaigns);
+
         } catch (error) {
             console.error('Error fetching data:', error);
             toast.error('Failed to load campaigns');
@@ -110,7 +181,8 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
 
     useEffect(() => {
         fetchAllData();
-    }, [status]); // Re-fetch when status changes
+    }, [status]);
+
 
     if (isLoading) {
         return (
