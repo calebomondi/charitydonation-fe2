@@ -137,7 +137,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
         <div>
             {/* Search Input */}
             <div className="w-full sticky top-16 z-50">
-                <div className="w-full p-2 grid place-items-center">
+                <div className="w-full p-2 m-2 grid place-items-center">
                     <input
                         type="text"
                         placeholder="Search campaigns by title or address..."

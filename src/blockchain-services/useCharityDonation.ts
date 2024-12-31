@@ -4,7 +4,7 @@ import { CampaignDataArgs, CreateCampaignArgs, CampaignDonors, Donation, Withdra
 import { toast } from "react-toastify";
 
 //For Events (Alchemy)
-const alchemy_rpc = import.meta.env.ALCHEMY_RPC
+const alchemy_rpc = import.meta.env.VITE_ALCHEMY_RPC
 const _provider = new Web3.providers.WebsocketProvider(alchemy_rpc);
 export const _web3 = new Web3(_provider);
 export const _contract = new _web3.eth.Contract(contractABI, contractADDR);
