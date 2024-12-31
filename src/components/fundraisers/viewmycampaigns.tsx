@@ -136,7 +136,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     return (
         <div>
             {/* Search Input */}
-            <div className="w-full sticky top-28 backdrop-blur-md bg-black/20 z-40">
+            <div className="w-full sticky top-16 z-50">
                 <div className="w-full p-2 grid place-items-center">
                     <input
                         type="text"
