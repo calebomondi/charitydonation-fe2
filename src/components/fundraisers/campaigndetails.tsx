@@ -393,7 +393,7 @@ export default function CampaignDetails() {
                                                                             {/* if there is a button in form, it will close the modal */}
                                                                             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                                                                             </form>
-                                                                            <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Distribute To Benefeciary</h3>
+                                                                            <h3 className="font-semibold text-lg text-green-600 p-2 text-center">Disburse To Benefeciary</h3>
                                                                             <div>
                                                                                 <form onSubmit={handleWithdrawal} className="flex flex-col justify-center items-center p-1">
                                                                                     <label className="input input-bordered w-full flex items-center justify-between gap-2 mb-1 font-semibold text-green-600">
@@ -424,7 +424,7 @@ export default function CampaignDetails() {
                                                                                     </label>
                                                                                     <div className="mt-2 w-full grid place-items-center">
                                                                                         <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
-                                                                                            {isSending ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Send'}
+                                                                                            {isSending ? (<p className="text-center flex justify-evenly items-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Send'}
                                                                                         </button>
                                                                                     </div>
                                                                                 </form>
