@@ -50,3 +50,11 @@ export interface Donation {
     title: string;
     amount: bigint;
 }
+
+export interface Withdrawal {
+    campaignId: string;
+    title: string;
+    amount: string;
+    by: string;
+    to: string;
+}

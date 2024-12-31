@@ -1,6 +1,6 @@
 import { contractABI, contractADDR } from "./core"; 
 import Web3 from "web3";
-import { CampaignDataArgs, CreateCampaignArgs, CampaignDonors, Donation } from "../types";
+import { CampaignDataArgs, CreateCampaignArgs, CampaignDonors, Donation, Withdrawal } from "../types";
 import { toast } from "react-toastify";
 
 //For Events (Alchemy)
@@ -570,6 +570,31 @@ export const myDonations = async (): Promise<Donation[]> => {
     } catch (error) {
         console.error('Failed to fetch donations:', error);
         toast.error("Failed To Fetcj Donations")
+        return [];
+    }
+}
+
+export const getCampaignWithdrawals = async (campaignAddress: string): Promise<Withdrawal[]> => {
+    try {
+        // Get the withdrawals list from the contract
+        const result: { 
+            withdrwals: Withdrawal[],
+            admins: string[] 
+        } = await contract.methods
+            .viewWithdrawals(campaignAddress)
+            .call();
+
+        const { withdrwals: withdrawalsList } = result;
+
+        // Validate the response
+        if (!Array.isArray(withdrawalsList)) {
+            throw new Error('Invalid withdrawals data structure');
+        }
+
+        return withdrawalsList;
+
+    } catch (error) {
+        console.error("Failed to get campaign withdrawals:", error);
         return [];
     }
 }

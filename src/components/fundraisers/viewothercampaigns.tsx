@@ -87,6 +87,17 @@ export default function ViewOtherCampaigns() {
         );
     }
 
+    if (combined.length === 0) {
+        return (
+            <div className="p-5 grid place-items-center h-screen">
+                <div className="text-green-600 flex flex-col justify-center items-center">
+                    <span className="text-xl">There No Active Fundraisers Yet!</span>
+                    <span>......</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div>
             <div className="m-1 p-1 flex flex-wrap justify-center items-center">

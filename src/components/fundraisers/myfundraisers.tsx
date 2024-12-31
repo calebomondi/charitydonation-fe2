@@ -24,12 +24,14 @@ export default function MyFundraisers() {
   const [viewActive, setViewActive] = useState<boolean>(true)
 
   useEffect(() => {
+    if (!_contract) return;
+
     //listen to multiple events
     const subscriptions: ContractLogsSubscription[] = []
 
     //campaign creation event
     const campaignCreated = _contract.events.CampaignCreated();
-    campaignCreated.on('data', async (event) => {
+    campaignCreated.once('data', async (event) => {
         /*__upload to DB__*/
         // Get stored image data
         const storedImage = localStorage.getItem('pendingCampaignImage');
@@ -92,7 +94,7 @@ export default function MyFundraisers() {
 
     //add admin event
     const addAdmin = _contract.events.AddAdmin();
-    addAdmin.on('data', (event) => {
+    addAdmin.once('data', (event) => {
       const admin = event.returnValues.admin
       toast.success(`Added ${admin?.toString().slice(0,6)}...${admin?.toString().slice(-4)} As Fundraiser Admin`)
     });
@@ -101,7 +103,7 @@ export default function MyFundraisers() {
 
     //remove admin event
     const removeAdmin = _contract.events.RemoveAdmin();
-    removeAdmin.on('data', (event) => {
+    removeAdmin.once('data', (event) => {
       const admin = event.returnValues.admin
       toast.success(`Removed ${admin?.toString().slice(0,6)}...${admin?.toString().slice(-4)} As Fundraiser Admin`)
     });

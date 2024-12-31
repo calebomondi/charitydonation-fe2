@@ -27,6 +27,7 @@ export default function CampaignDetails() {
     //form values
     const [formValue, setFormValue] = useState<{amount: string}>({amount : ''})
     const [formValueW, setFormValueW] = useState<{recipient:string, amount: string}>({recipient: '', amount : ''})
+    
 
     const navigate = useNavigate()
 
@@ -46,30 +47,33 @@ export default function CampaignDetails() {
             }, 1000)
             //check if admin
             await checkIfAdmin()
+            //get withdrawals
+
         }
         fetchData()
     })
 
     useEffect(() => {
+        if (!_contract) return;
+
         //listen to multiple events
         const subscriptions: ContractLogsSubscription[] = []
     
         //campaign cancelled event
         const campaignCancelled = _contract.events.CampaignCancelled();
-        campaignCancelled.on('data', (event) => {
+        campaignCancelled.once('data', (event) => {
             const id = event.returnValues.campaign_id
             toast.success(`You Have Cancelled Fundraiser of ID ${id?.toString()}`)
             //handle event
-            setTimeout(() => {
-                navigate("/my-fundraisers")
-            },1000)
+            navigate("/my-fundraisers")
+
         });
         campaignCancelled.on('error', console.error);
         subscriptions.push(campaignCancelled)
     
         //donate event
         const donateToCampaign = _contract.events.DonationReceived();
-        donateToCampaign.on('data', (event) => {
+        donateToCampaign.once('data', (event) => {
           const amount = event.returnValues.amount as bigint
           toast.success(`Received Donation of ${_web3.utils.fromWei(amount,'ether')} sETH, Thank You 🙂`)
         });
@@ -78,7 +82,7 @@ export default function CampaignDetails() {
     
         //withdraw event
         const withdrawFromCampaign = _contract.events.FundsWithdrawn();
-        withdrawFromCampaign.on('data', (event) => {
+        withdrawFromCampaign.once('data', (event) => {
           const amount = event.returnValues.amount as bigint
           const recipeint = event.returnValues.to as string
           toast.success(`${_web3.utils.fromWei(amount,'ether')} Sent To ${recipeint.slice(0,6)}...${recipeint.slice(-4)}`)
@@ -88,7 +92,7 @@ export default function CampaignDetails() {
     
         //refund donors event
         const refundDonors = _contract.events.RefundCampaignDonors();
-        refundDonors.on('data', (event) => {
+        refundDonors.once('data', (event) => {
           const amount = event.returnValues.amount as bigint
           const recipeint = event.returnValues.to as string
           toast.success(`Refunded Donor ${recipeint?.toString().slice(0,6)}...${recipeint?.toString().slice(-4)} Amount ${_web3.utils.fromWei(amount,'ether')} sETH`)
@@ -317,7 +321,7 @@ export default function CampaignDetails() {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        {isRefunding ? (<p className="text-center"><span>Refunding </span><span className="loading loading-ring loading-xs"></span></p>) : 'Refund'}
+                                                                        {isRefunding ? (<p className="text-center flex justify-between items-center"><span>Refunding </span><span className="loading loading-ring loading-xs"></span></p>) : 'Refund'}
                                                                     </button>
                                                                     <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
                                                                         <div className="modal-box">
@@ -342,7 +346,7 @@ export default function CampaignDetails() {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        {isCancelling ? (<p className="text-center"><span>Cancelling </span><span className="loading loading-ring loading-xs"></span></p>) : 'Cancel'}
+                                                                        {isCancelling ? (<p className="text-center flex justify-evenly items-center"><span>Cancelling </span><span className="loading loading-ring loading-xs"></span></p>) : 'Cancel'}
                                                                     </button>
                                                                     <dialog id="my_modal_6" className="modal modal-bottom sm:modal-middle">
                                                                         <div className="modal-box">
@@ -487,13 +491,11 @@ export default function CampaignDetails() {
                 <>
                 <h2 className="text-center text-green-600 text-xl font-semibold m-1">Fundraiser Donors</h2>
                 <p className="text-center"><span className="font-semibold text-lg">Total: </span><span className="font-mono text-lg">{campaignDonors.length}</span></p>
-                <div>
+                <div className="p-1 font-mono text-base flex flex-wrap justify-center items-center md:max-h-40 overflow-y-scroll h-auto max-h-80">
                     {campaignDonors.map((donor, index) => (
-                        <div key={index} className="p-1 font-mono text-base flex flex-wrap justify-center items-center line-clamp-3 md:max-h-40 overflow-y-scroll h-auto max-h-80">
-                            <p className="m-1">
-                                <span className="font-semibold">{index + 1}. </span><span>{donor.address?.slice(0,6)}...{donor.address?.slice(-5)}({_web3.utils.fromWei(donor.amount?.toString(),'ether')})</span>
-                            </p>
-                        </div>
+                        <p className="m-1 w-auto" key={index}>
+                            <span className="font-semibold">{index + 1}. </span><span>{donor.address?.slice(0,6)}...{donor.address?.slice(-5)}({_web3.utils.fromWei(donor.amount?.toString(),'ether')})</span>
+                        </p>
                     ))}
                 </div>
                 </>
