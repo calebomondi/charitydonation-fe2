@@ -57,8 +57,8 @@ export default function CreateForm() {
                 {
                     title: formValues.title,
                     description: formValues.description, 
-                    target: formValues.target.toString(), 
-                    durationDays: formValues.durationDays.toString()
+                    target: formValues.target, 
+                    durationDays: formValues.durationDays
                 }
             );
         } catch (error:any) {

@@ -43,3 +43,10 @@ export interface CampaignDonors {
     address: string;
     amount: bigint;
 }
+
+export interface Donation {
+    campaignAddress: string;
+    campaignId: bigint;
+    title: string;
+    amount: bigint;
+}

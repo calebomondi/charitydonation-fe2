@@ -1,6 +1,6 @@
 import { contractABI, contractADDR } from "./core"; 
 import Web3 from "web3";
-import { CampaignDataArgs, CreateCampaignArgs, CampaignDonors } from "../types";
+import { CampaignDataArgs, CreateCampaignArgs, CampaignDonors, Donation } from "../types";
 import { toast } from "react-toastify";
 
 //For Events (Alchemy)
@@ -153,7 +153,6 @@ export const createCampaign = async ({title, description, target, durationDays} 
         }
   
         console.error("Failed to create campaign:", error);
-        toast.error("Failed To Create Campaign!")
         throw new Error("Failed to create campaign: " + error.message);
     }
 }
@@ -538,5 +537,39 @@ export const withdrawFromCampaign = async (campaignId:number,campaignAddress:str
         console.error("Failed To Process Withdrawal:", error);
         toast.error("Failed To Process Withdrawal")
         throw new Error("Failed To Process Withdrawal:" + error.message);
+    }
+}
+
+//view Users Donations
+export const myDonations = async (): Promise<Donation[]> => {
+    try {
+        // Get connected account
+        const balanceAndAddress = await getBalanceAndAddress();
+        if (!balanceAndAddress) {
+            throw new Error('Failed to get balance and address');
+        }
+        const { account } = balanceAndAddress;
+
+        // Call the contract method
+        const result: Donation[] = await contract.methods
+            .viewDonations()
+            .call({ from: account });
+        
+        // Transform the result to match our interface
+        const donations: Donation[] = result.map((donation: any) => ({
+            campaignAddress: donation[0] || donation.campaignAddress,
+            campaignId: BigInt(donation[1] || donation.campaignId || '0'),
+            title: donation[2] || donation.title || '',
+            amount: BigInt(donation[3] || donation.amount || '0')
+        }));
+
+        console.log('Fetched donations:', donations);
+        return donations;
+        
+
+    } catch (error) {
+        console.error('Failed to fetch donations:', error);
+        toast.error("Failed To Fetcj Donations")
+        return [];
     }
 }

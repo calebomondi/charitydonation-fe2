@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from '../Home/home';
-import Donate from '../donations/donate';
 import MyDonations from '../donations/mydonations';
 import MyFundraisers from '../fundraisers/myfundraisers';
 import Fundraisers from '../fundraisers/fundraisers';
@@ -14,10 +13,6 @@ const AuthenticatedApp: React.FC = () => {
             <Route
                 path="/"
                 element={<Home />}
-            />
-            <Route
-                path="/donate"
-                element={<Donate />}
             />
             <Route
                 path="/my-donations"

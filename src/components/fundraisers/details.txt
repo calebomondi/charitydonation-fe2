@@ -152,9 +152,8 @@ export default function CampaignDetails() {
             const deadline = new Date(ts).toLocaleDateString();
 
             //add progress
-            const progress = Math.round(
-                Number(details.raisedAmount * BigInt(100) / details.targetAmount)
-            );
+            const find = details.raisedAmount / details.targetAmount * BigInt(100)
+            const progress = Math.round(Number(find))
         
             return {
             ...details,

@@ -6,7 +6,6 @@ import AdminManagement from "./admin"
 import { _contract, _web3 } from "../../blockchain-services/useCharityDonation"
 
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
 
 import { ContractLogsSubscription } from "web3-eth-contract"
 
@@ -23,10 +22,6 @@ export default function MyFundraisers() {
   const [viewCompleted, setViewCompleted] = useState<boolean>(false)
   const [viewCancelled, setViewCancelled] = useState<boolean>(false)
   const [viewActive, setViewActive] = useState<boolean>(true)
-  //toast display
-  //const [isShown, setIsShown] = useState<boolean>(false)
-  //navigate
-  const navigate = useNavigate()
 
   useEffect(() => {
     //listen to multiple events
@@ -86,10 +81,6 @@ export default function MyFundraisers() {
             //notify creator
             toast.success(`'${event.returnValues.title}' Fundraiser Was Created Successfully!`)
 
-            setTimeout(() => {
-              navigate("/my-fundraisers")
-            },1000)
-
           } catch (error) {
             console.log('Failed To Upload Image: ',error)
             setCreating(false)
@@ -112,7 +103,7 @@ export default function MyFundraisers() {
     const removeAdmin = _contract.events.RemoveAdmin();
     removeAdmin.on('data', (event) => {
       const admin = event.returnValues.admin
-      toast.success(`Added ${admin?.toString().slice(0,6)}...${admin?.toString().slice(-4)} As Fundraiser Admin`)
+      toast.success(`Removed ${admin?.toString().slice(0,6)}...${admin?.toString().slice(-4)} As Fundraiser Admin`)
     });
     removeAdmin.on('error', console.error);
     subscriptions.push(removeAdmin)
@@ -213,21 +204,11 @@ export default function MyFundraisers() {
           <>
             {
               creating ? (
-                <>
-                {/*
                   <div className="w-full bg-green-600 bg-opacity-60 h-dvh grid place-items-center">
                     <div className="flex justify-center items-center flex-col p-1 bg-black bg-opacity-50 rounded-xl">
                       <span className="text-lg font-mono">Working on your fundraiser</span> <span className="loading loading-infinity loading-lg"></span>
                     </div>
-                  </div>
-                */}
-                  <dialog id="my_modal_6" className="modal modal-bottom sm:modal-middle">
-                    <div className="modal-box text-green-600">
-                        <h3 className="font-semibold text-lg">Working on your fundraiser</h3>
-                        <p className="py-4 text-center"><span className="loading loading-infinity loading-lg"></span></p>
-                    </div>
-                  </dialog>
-                </>
+                  </div>                
               ) : (
                 <CreateForm />
               )
