@@ -192,13 +192,15 @@ export default function MyFundraisers() {
   return (
     <div>
       <NavBar />   
-      <div className="flex justify-center items-center p-2">
-        <div className="flex justify-evenly w-full md:w-1/2 p-1">
-          <div onClick={() => manageView(1)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCancelled ? 'border-b-green-700 border-b-2' : ''}`}>Cancelled</div>
-          <div onClick={() => manageView(2)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCompleted ? 'border-b-green-700 border-b-2' : ''}`}>Completed</div>
-          <div onClick={() => manageView(5)} className={`font-bold text-green-600 hover:cursor-pointer ${viewActive ? 'border-b-green-700 border-b-2' : ''}`}>Active</div>
-          <div onClick={() => manageView(3)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCreate ? 'border-b-green-700 border-b-2' : ''}`}>Create</div>
-          <div onClick={() => manageView(4)} className={`font-bold text-green-600 hover:cursor-pointer ${viewAdmin ? 'border-b-green-700 border-b-2' : ''}`}>Admins</div>
+      <div className="sticky top-16 backdrop-blur-md bg-black/20 z-40 w-full">
+        <div className="flex justify-center items-center p-2">
+          <div className="flex justify-evenly w-full md:w-1/2 p-1">
+            <div onClick={() => manageView(1)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCancelled ? 'border-b-green-700 border-b-2' : ''}`}>Cancelled</div>
+            <div onClick={() => manageView(2)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCompleted ? 'border-b-green-700 border-b-2' : ''}`}>Completed</div>
+            <div onClick={() => manageView(5)} className={`font-bold text-green-600 hover:cursor-pointer ${viewActive ? 'border-b-green-700 border-b-2' : ''}`}>Active</div>
+            <div onClick={() => manageView(3)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCreate ? 'border-b-green-700 border-b-2' : ''}`}>Create</div>
+            <div onClick={() => manageView(4)} className={`font-bold text-green-600 hover:cursor-pointer ${viewAdmin ? 'border-b-green-700 border-b-2' : ''}`}>Admins</div>
+          </div>
         </div>
       </div>
       {

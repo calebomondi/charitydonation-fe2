@@ -1,6 +1,6 @@
 import { viewCampaignDetails } from "../../blockchain-services/useCharityDonation"
 import { CampaignDataArgs, CombinedCampaignData } from "../../types"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { _web3 } from "../../blockchain-services/useCharityDonation"
 import { toast } from "react-toastify"
@@ -9,15 +9,23 @@ import { supabase } from "../../supabase/supabaseClient"
 export default function ViewOtherCampaigns() {
     const [combined, setCombined] = useState<CombinedCampaignData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
     const handleRedirect = (id: string, address: string) => {
         navigate(`/campaign-details?address=${address}&id=${id}`);
     }
 
-    useEffect(() => {
-        fetchAllData();
-    }, []);
+    // Memoized search filter
+    const filteredCampaigns = useMemo(() => {
+        if (!searchQuery.trim()) return combined;
+        
+        const query = searchQuery.toLowerCase();
+        return combined.filter(campaign => 
+            campaign.title.toLowerCase().includes(query) ||
+            campaign.campaignAddress.toString().toLowerCase().includes(query)
+        );
+    }, [combined, searchQuery]);
 
     // Combine fetch operations
     const fetchAllData = async () => {
@@ -76,6 +84,10 @@ export default function ViewOtherCampaigns() {
         }
     };
 
+    useEffect(() => {
+        fetchAllData();
+    }, []);
+
     if (isLoading) {
         return (
             <div className="p-5 grid place-items-center h-screen">
@@ -100,8 +112,22 @@ export default function ViewOtherCampaigns() {
 
     return (
         <div>
+            {/* Search Input */}
+            <div className="sticky top-16 backdrop-blur-md bg-black/20 z-40 w-full">
+                <div className="w-full p-2 grid place-items-center">
+                    <input
+                        type="text"
+                        placeholder="Search fundraisers by title or address..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="input input-bordered w-full md:w-1/2"
+                    />
+                </div>
+            </div>
+    
+            {/* Campaign Cards */}
             <div className="m-1 p-1 flex flex-wrap justify-center items-center">
-                {combined.map(campaign => (
+                {filteredCampaigns.map(campaign => (
                     <div 
                         key={`${campaign.campaignAddress}-${campaign.campaign_id}`}
                         onClick={() => handleRedirect(
@@ -114,7 +140,7 @@ export default function ViewOtherCampaigns() {
                             <img
                                 src={campaign.imageUrl || ''}
                                 alt={campaign.title} 
-                                className=""
+                                className="w-full h-full object-cover"
                             />
                         </figure>
                         <div className="card-body">
@@ -124,7 +150,7 @@ export default function ViewOtherCampaigns() {
                             <p className="line-clamp-2 w-full text-base">
                                 {campaign.description}
                             </p>
-                            <div className="flex">
+                            <div className="flex justify-between">
                                 <p className="text-center">
                                     <span className="font-semibold text-base">Target: </span>
                                     <span className="font-mono">
@@ -149,6 +175,13 @@ export default function ViewOtherCampaigns() {
                     </div>
                 ))}
             </div>
+
+            {/* No Results Message */}
+            {filteredCampaigns.length === 0 && searchQuery && (
+                <div className="text-green-600 p-2 m-2 text-center">
+                    <p className="text-lg">No fundraisers found matching "{searchQuery}"</p>
+                </div>
+            )}
         </div>
     );
 }

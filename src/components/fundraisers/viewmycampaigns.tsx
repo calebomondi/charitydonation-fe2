@@ -45,7 +45,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
         const query = searchQuery.toLowerCase();
         return combined.filter(campaign => 
             campaign.title.toLowerCase().includes(query) ||
-            campaign.description.toLowerCase().includes(query)
+            campaign.campaignAddress.toString().toLowerCase().includes(query)
         );
     }, [combined, searchQuery]);
 
@@ -136,14 +136,16 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     return (
         <div>
             {/* Search Input */}
-            <div className="w-full max-w-md mx-auto mb-6">
-                <input
-                    type="text"
-                    placeholder="Search campaigns by title or description..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="input input-bordered w-full"
-                />
+            <div className="w-full sticky top-28 backdrop-blur-md bg-black/20 z-40">
+                <div className="w-full p-2 grid place-items-center">
+                    <input
+                        type="text"
+                        placeholder="Search campaigns by title or address..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="input input-bordered w-full md:w-1/2"
+                    />
+                </div>
             </div>
 
             {/* Campaign Cards */}
