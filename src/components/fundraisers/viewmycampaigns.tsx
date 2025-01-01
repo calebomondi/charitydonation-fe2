@@ -265,7 +265,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     return (
         <div>
             {/* Search Input */}
-            <div className="w-full sticky top-16 z-50">
+            <div className="w-full sticky top-16 z-30">
                 <div className="w-full p-2 mt-2 grid place-items-center">
                     <input
                         type="text"
@@ -284,7 +284,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                         {campaign.imageUrl && (
                             <div 
                                 key={`${campaign.campaignAddress}-${campaign.campaign_id}`}
-                                className="card card-compact bg-white/10 backdrop-blur-sm overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg m-2 border border-green-200 dark:border-gray-500 hover:border-green-500 transition duration-300 hover:cursor-pointer"
+                                className="card card-compact bg-white/10  overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg m-2 border border-green-200 dark:border-gray-500 hover:border-green-500 transition duration-300 hover:cursor-pointer"
                                 onClick={() => handleRedirect(
                                     campaign.campaign_id.toString(),
                                     campaign.campaignAddress.toString()

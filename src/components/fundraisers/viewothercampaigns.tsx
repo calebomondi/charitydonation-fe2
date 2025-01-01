@@ -190,7 +190,7 @@ export default function ViewOtherCampaigns() {
                             campaign.campaign_id.toString(),
                             campaign.campaignAddress.toString()
                         )} 
-                        className="card card-compact bg-white/10 backdrop-blur-sm overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg hover:cursor-pointer m-2 border border-green-200 dark:border-gray-500 hover:border-green-500 transition duration-300"
+                        className="card card-compact bg-white/10 overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg hover:cursor-pointer m-2 border border-green-200 dark:border-gray-500 hover:border-green-500 transition duration-300"
                     >
                         <figure className="max-h-60">
                             <img
