@@ -1,16 +1,19 @@
 import { viewCampaignDetails } from "../../blockchain-services/useCharityDonation"
-import { CampaignDataArgs, CombinedCampaignData } from "../../types"
+import { CampaignDataArgs, CombinedCampaignData, SerializedCampaignData } from "../../types"
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { _web3 } from "../../blockchain-services/useCharityDonation"
 import { toast } from "react-toastify"
 import { supabase } from "../../supabase/supabaseClient"
+import { useCookies } from "react-cookie"
 
 export default function ViewOtherCampaigns() {
     const [combined, setCombined] = useState<CombinedCampaignData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
+
+    const [cookies, setCookie] = useCookies([`other_campaigns`])
 
     const handleRedirect = (id: string, address: string) => {
         navigate(`/campaign-details?address=${address}&id=${id}`);
@@ -26,6 +29,44 @@ export default function ViewOtherCampaigns() {
             campaign.campaignAddress.toString().toLowerCase().includes(query)
         );
     }, [combined, searchQuery]);
+
+    // Convert CombinedCampaignData to serialized form for cookie
+    const serializeCampaignData = (data: CombinedCampaignData[]): SerializedCampaignData[] => {
+        return data.map(campaign => ({
+            campaign_id: campaign.campaign_id.toString(),
+            title: campaign.title,
+            description: campaign.description,
+            campaignAddress: campaign.campaignAddress,
+            targetAmount: campaign.targetAmount.toString(),
+            raisedAmount: campaign.raisedAmount.toString(),
+            balance: campaign.balance.toString(),
+            deadline: campaign.deadline.toString(),
+            isCompleted: campaign.isCompleted,
+            isCancelled: campaign.isCancelled,
+            imageUrl: campaign.imageUrl,
+            endDate: campaign.endDate,
+            progress: campaign.progress,
+        }));
+    };
+
+    // Convert serialized data back to CombinedCampaignData
+    const deserializeCampaignData = (data: SerializedCampaignData[]): CombinedCampaignData[] => {
+        return data.map(campaign => ({
+            campaign_id: BigInt(campaign.campaign_id),
+            title: campaign.title,
+            description: campaign.description,
+            campaignAddress: campaign.campaignAddress,
+            targetAmount: BigInt(campaign.targetAmount),
+            raisedAmount: BigInt(campaign.raisedAmount),
+            balance: BigInt(campaign.balance),
+            deadline: BigInt(campaign.deadline),
+            isCompleted: campaign.isCompleted,
+            isCancelled: campaign.isCancelled,
+            imageUrl: campaign.imageUrl,
+            endDate: campaign.endDate,
+            progress: campaign.progress,
+        }));
+    };
 
     // Combine fetch operations
     const fetchAllData = async () => {
@@ -76,6 +117,14 @@ export default function ViewOtherCampaigns() {
                 );
 
             setCombined(filteredData);
+            // Store the new data in cookie
+
+            setCookie(`other_campaigns`, serializeCampaignData(filteredData), {
+                path: '/fundraisers',
+                maxAge: 3600, // Cookie expires in 1 hour
+                secure: true,
+                sameSite: 'strict'
+            });
         } catch (error) {
             console.error('Error fetching data:', error);
             toast.error('Failed to load campaigns');
@@ -85,6 +134,13 @@ export default function ViewOtherCampaigns() {
     };
 
     useEffect(() => {
+        //Try to load data from cookie
+        const cookieData = cookies[`other_campaigns`]
+        if (cookieData) {
+            console.log(`other-campaigns: ${cookieData}`)
+            setCombined(deserializeCampaignData(cookieData))
+        }
+        //referesh data
         fetchAllData();
     }, []);
 

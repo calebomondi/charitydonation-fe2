@@ -65,3 +65,19 @@ export interface Withdrawal {
     by: string;
     to: string;
 }
+
+export interface SerializedCampaignData {
+    campaign_id: string;
+    title: string;
+    description: string;
+    campaignAddress: string;
+    targetAmount: string;
+    raisedAmount: string;
+    balance: string;
+    deadline: string;
+    isCompleted: boolean;
+    isCancelled: boolean;
+    imageUrl: string | null;
+    endDate: string;
+    progress: string;
+}
