@@ -113,7 +113,7 @@ export default function CreateForm() {
                             name="title"
                             value={formValues.title}
                             onChange={handleChange}
-                            className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                            className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                             placeholder="Fundraiser Name" 
                             required
                         />
@@ -125,7 +125,7 @@ export default function CreateForm() {
                 <div className="mb-2">
                     <textarea
                         placeholder="Fundraiser description"
-                        className="textarea textarea-bordered textarea-sm w-full darK:text-white text-gray-700 text-base"
+                        className="textarea textarea-bordered textarea-sm w-full dark:text-white text-gray-700 text-base"
                         id="description"
                         name="description"
                         value={formValues.description}
@@ -144,7 +144,7 @@ export default function CreateForm() {
                         name="target"
                         value={formValues.target}
                         onChange={handleChange}
-                        className="darK:text-white text-gray-700 md:w-5/6 p-2" 
+                        className="dark:text-white text-gray-700 md:w-5/6 p-2" 
                         placeholder="In ETH" 
                         required
                     />
@@ -157,7 +157,7 @@ export default function CreateForm() {
                         name="durationDays"
                         value={formValues.durationDays}
                         onChange={handleChange}
-                        className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                        className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                         placeholder="In Days" 
                         required
                     />

@@ -411,7 +411,7 @@ export default function CampaignDetails() {
                                                                                             name="recipient"
                                                                                             value={formValueW.recipient}
                                                                                             onChange={handleWithdrawalChange}
-                                                                                            className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                                                                                            className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                                                                                             placeholder="Address" 
                                                                                             required
                                                                                         />
@@ -424,7 +424,7 @@ export default function CampaignDetails() {
                                                                                             name="amount"
                                                                                             value={formValueW.amount}
                                                                                             onChange={handleWithdrawalChange}
-                                                                                            className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                                                                                            className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                                                                                             placeholder="In ETH" 
                                                                                             required
                                                                                         />
@@ -480,7 +480,7 @@ export default function CampaignDetails() {
                                                                                                 name="amount"
                                                                                                 value={formValue.amount}
                                                                                                 onChange={handleChange}
-                                                                                                className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                                                                                                className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                                                                                                 placeholder="In ETH" 
                                                                                                 required
                                                                                             />

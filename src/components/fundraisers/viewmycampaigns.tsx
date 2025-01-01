@@ -227,7 +227,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                         {campaign.imageUrl && (
                             <div 
                                 key={`${campaign.campaignAddress}-${campaign.campaign_id}`}
-                                className="card card-compact bg-white/10 backdrop-blur-sm overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg m-2 border border-green-200 hover:border-green-500 transition duration-300 hover:cursor-pointer"
+                                className="card card-compact bg-white/10 backdrop-blur-sm overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg m-2 border border-green-200 dark:border-gray-500 hover:border-green-500 transition duration-300 hover:cursor-pointer"
                                 onClick={() => handleRedirect(
                                     campaign.campaign_id.toString(),
                                     campaign.campaignAddress.toString()

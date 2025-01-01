@@ -78,7 +78,7 @@ export default function AdminManagement() {
                         type="text" 
                         id="address"
                         name="address"
-                        className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                        className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                         value={formValue.address}
                         onChange={handleChange}
                         placeholder="Admin's Address" 
@@ -109,7 +109,7 @@ export default function AdminManagement() {
                         type="text" 
                         id="address"
                         name="address"
-                        className="md:w-5/6 p-2 darK:text-white text-gray-700" 
+                        className="md:w-5/6 p-2 dark:text-white text-gray-700" 
                         value={formValue.address}
                         onChange={handleChange}
                         placeholder="Admin's Address" 
