@@ -38,9 +38,9 @@ export async function connectWallet() : Promise<string | null> {
         if (!ethereum) {
             if(isMobile){
                 //1. Open MetaMask app
-                //window.open('https://metamask.app.link/dapp/undugu-beta.vercel.app');
+                window.open('https://metamask.app.link/dapp/undugu-beta.vercel.app');
                 //2. provide instructions
-                toast.info("Please open this dApp in MetaMask browser or another Web3-enabled browser");
+                //toast.info("Please open this dApp in MetaMask browser or another Web3-enabled browser");
             } else {
                 console.log('Please install MetaMask!');
                 toast.error("Please install MetaMask or another Web3 wallet");
