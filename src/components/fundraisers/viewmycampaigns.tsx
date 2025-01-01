@@ -186,7 +186,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
 
     if (isLoading) {
         return (
-            <div className="text-green-400 p-2 m-2 h-1/3 grid place-items-center">
+            <div className="text-green-600 p-2 m-2 h-1/3 grid place-items-center">
                 <p className="p-1 text-lg font-semibold mt-10 text-center">
                     Loading {status} Fundraisers...
                 </p>
@@ -197,7 +197,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
 
     if (!combined.length) {
         return (
-            <div className="text-green-400 p-2 m-2 h-1/3 grid place-items-center">
+            <div className="text-green-600 p-2 m-2 h-1/3 grid place-items-center">
                 <p className="p-1 text-lg font-semibold mt-10 text-center">
                     You Have No {status} Fundraisers Yet!
                 </p>
@@ -215,7 +215,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                         placeholder="Search campaigns by title or address..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input input-bordered w-full md:w-1/2 shadow-xl"
+                        className="input input-bordered w-full md:w-1/2 shadow-xl border-green-500"
                     />
                 </div>
             </div>
@@ -227,7 +227,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
                         {campaign.imageUrl && (
                             <div 
                                 key={`${campaign.campaignAddress}-${campaign.campaign_id}`}
-                                className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:shadow-green-600 hover:shadow-sm transition duration-300 hover:cursor-pointer"
+                                className="card card-compact bg-white/10 backdrop-blur-sm overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg m-2 border border-green-200 hover:border-green-500 transition duration-300 hover:cursor-pointer"
                                 onClick={() => handleRedirect(
                                     campaign.campaign_id.toString(),
                                     campaign.campaignAddress.toString()
@@ -283,7 +283,7 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
 
             {/* No Results Message */}
             {filteredCampaigns.length === 0 && searchQuery && (
-                <div className="text-green-400 p-2 m-2 text-center">
+                <div className="text-green-600 p-2 m-2 text-center">
                     <p className="text-lg">No campaigns found matching "{searchQuery}"</p>
                 </div>
             )}

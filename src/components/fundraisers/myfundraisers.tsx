@@ -192,7 +192,7 @@ export default function MyFundraisers() {
   return (
     <div>
       <NavBar />   
-      <div className="sticky top-16 backdrop-blur-md bg-black/20 z-40 w-full">
+      <div className="sticky top-16 backdrop-blur-md darK:bg-black/20 bg-black/10 z-40 w-full">
         <div className="flex justify-center items-center p-2">
           <div className="flex justify-evenly w-full md:w-1/2 p-1">
             <div onClick={() => manageView(1)} className={`font-bold text-green-600 hover:cursor-pointer ${viewCancelled ? 'border-b-green-700 border-b-2' : ''}`}>Cancelled</div>

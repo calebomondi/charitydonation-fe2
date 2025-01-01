@@ -120,7 +120,7 @@ export default function ViewOtherCampaigns() {
                         placeholder="Search fundraisers by title or address..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="input input-bordered w-full md:w-1/2"
+                        className="input input-bordered w-full md:w-1/2 border-green-500"
                     />
                 </div>
             </div>
@@ -134,7 +134,7 @@ export default function ViewOtherCampaigns() {
                             campaign.campaign_id.toString(),
                             campaign.campaignAddress.toString()
                         )} 
-                        className="card card-compact bg-base-100 md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:cursor-pointer hover:shadow-green-600 hover:shadow-sm transition duration-300"
+                        className="card card-compact bg-white/10 backdrop-blur-sm overflow-hidden md:w-1/4 w-full md:h-1/2 shadow-lg m-1 hover:cursor-pointer hover:shadow-green-600 hover:shadow-sm transition duration-300"
                     >
                         <figure className="max-h-60">
                             <img
@@ -152,7 +152,7 @@ export default function ViewOtherCampaigns() {
                             </p>
                             <div className="flex justify-between">
                                 <p className="text-center">
-                                    <span className="font-semibold text-base">Target: </span>
+                                    <span className="font-semibold text-base">Goal: </span>
                                     <span className="font-mono">
                                         {_web3.utils.fromWei(campaign.targetAmount, 'ether')}
                                     </span> sETH
