@@ -7,8 +7,6 @@ import logowithtext from '/with-text.png'
 
 import { causes, testimonials } from './data';
 
-import Web3BrowserCheck from "./web3socket";
-
 function Home() {
     const [account, setAccount] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -32,7 +30,6 @@ function Home() {
     }
 
   return (
-    <Web3BrowserCheck>
     <div className="min-h-screen flex flex-col relative">
       {/* Gradient background */}
       <div 
@@ -166,7 +163,6 @@ function Home() {
         </button>
       </footer>
     </div>
-    </Web3BrowserCheck>
   )
 }
 
