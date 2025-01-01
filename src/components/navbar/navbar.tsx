@@ -3,6 +3,8 @@ import { Link } from "react-router-dom"
 import { useEffect, useState } from 'react'
 import { checkIfWalletIsConnected, getBalanceAndAddress } from '../../blockchain-services/useCharityDonation'
 
+import logo from '/jus-logo.png'
+
 export default function NavBar() {
     const navigate = useNavigate()
 
@@ -67,7 +69,9 @@ export default function NavBar() {
                 </li>
             </ul>
             </div>
-            <a className="btn btn-ghost text-xl">Undugu</a>
+            <div className="max-w-10 h-full">
+                <img src={logo} alt=""  className=""/>
+            </div>
         </div>
         <div className="navbar-center hidden lg:flex">
             <ul className="menu menu-horizontal px-1">

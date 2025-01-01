@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, Wallet, Globe, Users } from 'lucide-react';
 
+import logowithtext from '/with-text.png'
+
+import { causes, testimonials } from './data';
+
 function Home() {
     const [account, setAccount] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -25,67 +29,8 @@ function Home() {
         setAccount(account);
     }
 
-    const causes = [
-      {
-        title: "Clean Water Initiative",
-        location: "East Africa",
-        raised: "45000",
-        goal: "100000",
-        image: "/api/placeholder/400/250",
-        category: "Infrastructure"
-      },
-      {
-        title: "Education for All",
-        location: "South Asia",
-        raised: "28000",
-        goal: "50000",
-        image: "/api/placeholder/400/250",
-        category: "Education"
-      },
-      {
-        title: "Medical Supplies Drive",
-        location: "Latin America",
-        raised: "75000",
-        goal: "80000",
-        image: "/api/placeholder/400/250",
-        category: "Healthcare"
-      }
-    ];
-
-    const testimonials = [
-      {
-        name: "Maria Rodriguez",
-        location: "Colombia",
-        text: "Thanks to the medical supplies provided through this platform, our local clinic can now serve twice as many patients. The transparency of blockchain technology gave us confidence that every donation would reach its intended purpose.",
-        image: "/api/placeholder/64/64"
-      },
-      {
-        name: "John Kamau",
-        location: "Kenya",
-        text: "The Clean Water Initiative has transformed our community. We can track every donation and see exactly how the funds are being used. This transparency has encouraged more people to contribute to our cause.",
-        image: "/api/placeholder/64/64"
-      },
-      {
-        name: "Priya Patel",
-        location: "India",
-        text: "Education for All has helped us build three new classrooms and provide learning materials to over 200 students. The direct connection with donors through the platform has made this possible.",
-        image: "/api/placeholder/64/64"
-      }
-    ];
-
   return (
     <>
-    {/*
-    <div>
-      {
-        account ? (
-          <p>Connected account: {account}</p>
-        ) : (
-          <button className="btn btn-secondary" onClick={handleConnectWallet}>Connect</button>
-        )
-      }
-    </div>
-    */}
     <div className="min-h-screen flex flex-col relative">
       {/* Gradient background */}
       <div 
@@ -100,6 +45,11 @@ function Home() {
           <h1 className="text-4xl sm:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-300">
             Empowering Global Change Through Blockchain
           </h1>
+
+          {/**logo */}
+          <div className="grid place-items-center p-1">
+            <img src={logowithtext} alt="undugu logo with text" className="md:w-1/4 h-auto object-cover" />
+          </div>
           
           <p className="text-xl sm:text-2xl mb-8 text-gray-200">
             Join the revolution in transparent, decentralized charitable giving
@@ -170,13 +120,11 @@ function Home() {
                       />
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span>${parseInt(cause.raised).toLocaleString()} raised</span>
-                      <span>Goal: ${parseInt(cause.goal).toLocaleString()}</span>
+                      <span>{parseInt(cause.raised).toLocaleString()} ETH raised</span>
+                      <span>Goal: {parseInt(cause.goal).toLocaleString()} ETH</span>
                     </div>
                   </div>
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md">
-                    Support This Cause
-                  </button>
+                  
                 </div>
               </div>
             ))}
