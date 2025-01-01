@@ -144,6 +144,14 @@ VITE_ALCHEMY_RPC=your_rpc_url
 
 ![u-don2](https://github.com/user-attachments/assets/c99fc034-b9c4-4d08-a9d3-74f37249c192)
 
+### Track fundraisers
+1. Connect wallet
+2. Browse my donations tab to view list of donations
+3. Click fundraiser
+4. View the progress
+
+![u-track](https://github.com/user-attachments/assets/dacdc9f2-067b-400c-8446-38340316b6e7)
+
 ### Disbursing Funds
 1. Connect with admin wallet
 2. Access completed campaigns
