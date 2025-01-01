@@ -125,11 +125,15 @@ VITE_ALCHEMY_RPC=your_rpc_url
    - Funding goal
 4. Submit transaction to create campaign
 
+![u-create](https://github.com/user-attachments/assets/8d6ac02e-6d8d-43d4-a86c-589928e5fe7a)
+
 ### Managing Admins
 1. Access fundraiser dashboard
 2. Navigate to "Admin Management"
 3. Add admin addresses
 4. Confirm transaction to grant admin permissions
+
+![u-admin](https://github.com/user-attachments/assets/f3d80f4e-db79-455b-966b-63eb053a4d39)
 
 ### Making Donations
 1. Connect wallet
@@ -138,6 +142,8 @@ VITE_ALCHEMY_RPC=your_rpc_url
 4. Enter donation amount
 5. Confirm transaction
 
+![u-donate](https://github.com/user-attachments/assets/85a02bf6-c0b9-486d-92b3-ed4767824c86)
+
 ### Disbursing Funds
 1. Connect with admin wallet
 2. Access completed campaigns
@@ -145,10 +151,25 @@ VITE_ALCHEMY_RPC=your_rpc_url
 4. Add beneficiary addresses and amounts
 5. Confirm disbursement transaction
 
+![u-disburse](https://github.com/user-attachments/assets/b6abd685-aef8-4826-aab3-0fa032b9df19)
+
+### Refund/Cancel Fundraiser
+1. Connect with admin wallet
+2. Access failed campaigns
+3. Refund donors
+4. Cancel fundraiser
+5. Confirm cancellation
+
+![u-refund1](https://github.com/user-attachments/assets/bafd3c0a-0317-4cd0-be75-ec993e8becba)
+
+![u-refund2](https://github.com/user-attachments/assets/c0000e03-3613-45aa-b5d8-35770054a0bd)
+
 ### Campaign Status Tracking
 - **Active**: Ongoing campaigns accepting donations
 - **Completed**: Campaigns that reached their goals
 - **Cancelled**: Failed campaigns eligible for refunds
+
+![u-status](https://github.com/user-attachments/assets/78fc51ea-4f01-4de3-a1ff-33bbbda7f6d3)
 
 ## Security Features
 - Multi-admin verification system
@@ -169,3 +190,4 @@ MIT License
 ## Appendices
 1. Smartcontract Repo: [Link](https://github.com/calebomondi/charity-donation-hardhat)
 2. Sepolia deployment: [Link](https://sepolia.etherscan.io/address/0x133818926101eEE247B1188fcE4a13f993d9c6E8#code)
+3. Undugu Live : [Link](https://undugu-beta.vercel.app/)
