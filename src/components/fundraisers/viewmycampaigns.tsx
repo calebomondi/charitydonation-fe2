@@ -1,15 +1,18 @@
-import { CampaignDataArgs, CombinedCampaignDataX } from "../../types"
+import { CampaignDataArgs, CombinedCampaignDataX, SerializedCampaignDataX } from "../../types"
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { _web3 } from "../../blockchain-services/useCharityDonation"
 import { getBalanceAndAddress, myCampaigns, viewCampaignDetails, isActiveAdmin } from "../../blockchain-services/useCharityDonation"
 import { toast } from "react-toastify"
 import { supabase } from "../../supabase/supabaseClient"
+import { useCookies } from "react-cookie"
 
 export default function ViewMyCampaigns({ status }: { status: string }) {
     const [isLoading, setIsLoading] = useState(true);
     const [combined, setCombined] = useState<CombinedCampaignDataX[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [cookies, setCookie] = useCookies(["Active", "Completed", "Cancelled"]);
+
     const navigate = useNavigate();
 
     const handleRedirect = (id: string, address: string) => {
@@ -69,6 +72,46 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
             campaign.campaignAddress.toString().toLowerCase().includes(query)
         );
     }, [combined, searchQuery]);
+
+    // Convert CombinedCampaignData to serialized form for cookie
+    const serializeCampaignData = (data: CombinedCampaignDataX[]): SerializedCampaignDataX[] => {
+        return data.map(campaign => ({
+            campaign_id: campaign.campaign_id.toString(),
+            title: campaign.title,
+            description: campaign.description,
+            campaignAddress: campaign.campaignAddress,
+            targetAmount: campaign.targetAmount.toString(),
+            raisedAmount: campaign.raisedAmount.toString(),
+            balance: campaign.balance.toString(),
+            deadline: campaign.deadline.toString(),
+            isCompleted: campaign.isCompleted,
+            isCancelled: campaign.isCancelled,
+            imageUrl: campaign.imageUrl,
+            endDate: campaign.endDate,
+            progress: campaign.progress,
+            campaignKey: campaign.campaignKey
+        }));
+    };
+
+    // Convert serialized data back to CombinedCampaignData
+    const deserializeCampaignData = (data: SerializedCampaignDataX[]): CombinedCampaignDataX[] => {
+        return data.map(campaign => ({
+            campaign_id: BigInt(campaign.campaign_id),
+            title: campaign.title,
+            description: campaign.description,
+            campaignAddress: campaign.campaignAddress,
+            targetAmount: BigInt(campaign.targetAmount),
+            raisedAmount: BigInt(campaign.raisedAmount),
+            balance: BigInt(campaign.balance),
+            deadline: BigInt(campaign.deadline),
+            isCompleted: campaign.isCompleted,
+            isCancelled: campaign.isCancelled,
+            imageUrl: campaign.imageUrl,
+            endDate: campaign.endDate,
+            progress: campaign.progress,
+            campaignKey: campaign.campaignKey
+        }));
+    };
 
     // Combined fetch function
     const fetchAllData = async () => {
@@ -171,6 +214,15 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
             const mergedCampaigns = Array.from(campaignMap.values());
             setCombined(mergedCampaigns);
 
+            //set cookies
+            const cookieName = status as "Active" | "Completed" | "Cancelled";
+            setCookie(cookieName, serializeCampaignData(mergedCampaigns), {
+                path: '/my-fundraisers',
+                maxAge: 3600, // Cookie expires in 1 hour
+                secure: true,
+                sameSite: 'strict'
+            });
+
         } catch (error) {
             console.error('Error fetching data:', error);
             toast.error('Failed to load campaigns');
@@ -180,9 +232,14 @@ export default function ViewMyCampaigns({ status }: { status: string }) {
     };
 
     useEffect(() => {
+        const cookieName = status as "Active" | "Completed" | "Cancelled";
+        const cookieData = cookies[cookieName]
+        if (cookieData) {
+            console.log(`${cookieName}: ${cookieData}`)
+            setCombined(deserializeCampaignData(cookieData))
+        }
         fetchAllData();
     }, [status]);
-
 
     if (isLoading) {
         return (

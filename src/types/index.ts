@@ -81,3 +81,20 @@ export interface SerializedCampaignData {
     endDate: string;
     progress: string;
 }
+
+export interface SerializedCampaignDataX {
+    campaign_id: string;
+    title: string;
+    description: string;
+    campaignAddress: string;
+    targetAmount: string;
+    raisedAmount: string;
+    balance: string;
+    deadline: string;
+    isCompleted: boolean;
+    isCancelled: boolean;
+    imageUrl: string | null;
+    endDate: string;
+    progress: string;
+    campaignKey: string;
+}
