@@ -287,7 +287,7 @@ export default function CampaignDetails() {
                 <div className="w-full">
                     {
                         combined.map(campaign => (
-                            <div className="flex flex-col md:flex-row h-full m-1 rounded-lg border border-green-300 shadow-xl">
+                            <div className="flex flex-col md:flex-row h-full m-1 rounded-lg border border-green-300 shadow-xl dark:border-green-600">
                                 <div className="md:w-1/2 grid place-items-center p-1">
                                     <img 
                                         src={campaign?.imageUrl || ''} 
@@ -521,7 +521,7 @@ export default function CampaignDetails() {
             )
         }
         </div>
-        <div className={`p-1 m-2 rounded-lg  shadow-xl ${campaignDonors.length > 0 && 'border border-green-300 '}`}>
+        <div className={`p-1 m-2 rounded-lg  shadow-xl ${campaignDonors.length > 0 && 'border border-green-300 dark:border-green-600'}`}>
             {campaignDonors.length > 0 && (
                 <>
                 <h2 className="text-center text-green-600 text-xl font-semibold m-1">Fundraiser Donors</h2>
@@ -536,7 +536,7 @@ export default function CampaignDetails() {
                 </>
             )}
         </div>
-        <div className={`p-1 m-2 rounded-lg shadow-xl ${withdrawals.length > 0 && 'border border-green-300 '}`}>
+        <div className={`p-1 m-2 rounded-lg shadow-xl ${withdrawals.length > 0 && 'border border-green-300 dark:border-green-600'}`}>
             {campaignDonors.length > 0 && combined[0].isCompleted && (
                 <>
                 <h2 className="text-center text-green-600 text-xl font-semibold m-1">Fundraiser Disbursements</h2>
