@@ -142,7 +142,7 @@ VITE_ALCHEMY_RPC=your_rpc_url
 4. Enter donation amount
 5. Confirm transaction
 
-![u-donate](https://github.com/user-attachments/assets/85a02bf6-c0b9-486d-92b3-ed4767824c86)
+![u-don2](https://github.com/user-attachments/assets/c99fc034-b9c4-4d08-a9d3-74f37249c192)
 
 ### Disbursing Funds
 1. Connect with admin wallet
