@@ -35,7 +35,9 @@ export async function connectWallet() : Promise<string | null> {
         const ethereum = (window as any).ethereum;
         if (!ethereum) {
             console.log('Please install MetaMask!');
-            throw new Error('No ethereum provider found');
+            //throw new Error('No ethereum provider found');
+            toast.error("No ethereum provider found")
+            return null;
         }
 
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -43,6 +45,7 @@ export async function connectWallet() : Promise<string | null> {
         return account;
     } catch (error) {
         console.error('Error connecting wallet', error);
+        toast.error("Error Connecting Wallet")
         return null;
     }
 }
