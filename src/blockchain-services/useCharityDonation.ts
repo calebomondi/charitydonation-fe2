@@ -34,9 +34,7 @@ export async function connectWallet() : Promise<string | null> {
         // Check if MetaMask is installed
         const ethereum = (window as any).ethereum;
         if (!ethereum) {
-            console.log('Please install MetaMask!');
-            toast.error("Please install MetaMask or another Web3 wallet");
-            return null;
+            throw new Error('No ethereum provider found, Please Install Metamask Or Any Other Web3 Wallet');
         }
 
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -51,14 +49,22 @@ export async function connectWallet() : Promise<string | null> {
 
 //listen to wallet change
 export const listenForWalletEvents = () => {
-    const ethereum = (window as any).ethereum;
-    ethereum.on('accountsChanged',  (accounts: string[]) => {
-        console.log('Account changed', accounts[0]);
-    });
-    ethereum.on('chainChanged',  (chainId: string) => {
-        console.log('Chain changed', chainId);
-        window.location.reload();
-    })
+    try {
+        const ethereum = (window as any).ethereum;
+        if (!ethereum) {
+            throw new Error('No ethereum provider found');
+        }
+        ethereum.on('accountsChanged',  (accounts: string[]) => {
+            console.log('Account changed', accounts[0]);
+        });
+        ethereum.on('chainChanged',  (chainId: string) => {
+            console.log('Chain changed', chainId);
+            window.location.reload();
+        })
+    } catch (error) {
+        console.error('Error listening for wallet events', error);
+        toast.error(`${error}`)
+    }
 }
 
 //check if wallet is connected
@@ -66,12 +72,13 @@ export const checkIfWalletIsConnected = async () : Promise<boolean> => {
     try {
         const ethereum = (window as any).ethereum;
         if (!ethereum) {
-            return false;
+            throw new Error('No ethereum provider found');
         }
         const accounts = await ethereum.request({ method: 'eth_accounts' });
         return accounts.length > 0;
     } catch (error) {
         console.error('Error checking if wallet is connected', error);
+        toast.error(`${error}`)
         return false;
     }
 }
