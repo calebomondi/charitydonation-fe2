@@ -78,7 +78,7 @@ export default function AdminManagement() {
                         type="text" 
                         id="address"
                         name="address"
-                        className="md:w-5/6 p-2 text-white" 
+                        className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                         value={formValue.address}
                         onChange={handleChange}
                         placeholder="Admin's Address" 
@@ -88,7 +88,7 @@ export default function AdminManagement() {
                   <div className="p-1 flex justify-center">
                     <button 
                       type="submit" 
-                      className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
+                      className="btn bg-green-700 w-1/2 text-white text-base border border-green-700 hover:bg-green-600"
                     >
                       {
                         isAdding ? (<span className="loading loading-ring loading-xs"></span>) : 'Add'
@@ -109,7 +109,7 @@ export default function AdminManagement() {
                         type="text" 
                         id="address"
                         name="address"
-                        className="md:w-5/6 p-2 text-white" 
+                        className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                         value={formValue.address}
                         onChange={handleChange}
                         placeholder="Admin's Address" 
@@ -119,7 +119,7 @@ export default function AdminManagement() {
                   <div className="p-1 flex justify-center">
                     <button 
                       type="submit" 
-                      className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
+                      className="btn bg-green-700 w-1/2 text-white text-base border border-green-700 hover:bg-green-600"
                     >
                       {
                         isRemoving ? (<span className="loading loading-ring loading-xs"></span>) : 'Remove'

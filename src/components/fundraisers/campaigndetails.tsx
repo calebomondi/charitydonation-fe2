@@ -411,7 +411,7 @@ export default function CampaignDetails() {
                                                                                             name="recipient"
                                                                                             value={formValueW.recipient}
                                                                                             onChange={handleWithdrawalChange}
-                                                                                            className="md:w-5/6 p-2 text-white" 
+                                                                                            className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                                                                                             placeholder="Address" 
                                                                                             required
                                                                                         />
@@ -424,14 +424,14 @@ export default function CampaignDetails() {
                                                                                             name="amount"
                                                                                             value={formValueW.amount}
                                                                                             onChange={handleWithdrawalChange}
-                                                                                            className="md:w-5/6 p-2 text-white" 
+                                                                                            className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                                                                                             placeholder="In ETH" 
                                                                                             required
                                                                                         />
                                                                                     </label>
                                                                                     <div className="mt-2 w-full grid place-items-center">
                                                                                         <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
-                                                                                            {isSending ? (<p className="text-center flex justify-evenly items-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Send'}
+                                                                                            {isSending ? (<p className="text-center flex justify-evenly items-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Disburse'}
                                                                                         </button>
                                                                                     </div>
                                                                                 </form>
@@ -480,14 +480,14 @@ export default function CampaignDetails() {
                                                                                                 name="amount"
                                                                                                 value={formValue.amount}
                                                                                                 onChange={handleChange}
-                                                                                                className="md:w-5/6 p-2 text-white" 
+                                                                                                className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                                                                                                 placeholder="In ETH" 
                                                                                                 required
                                                                                             />
                                                                                         </label>
                                                                                         <div className="mt-2 w-full grid place-items-center">
                                                                                             <button className="btn btn-success btn-sm text-base-300 w-1/5" type="submit">
-                                                                                                {isGiving ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Give'}
+                                                                                                {isGiving ? (<p className="text-center"><span>Sending </span><span className="loading loading-ring loading-xs"></span></p>) : 'Support'}
                                                                                             </button>
                                                                                         </div>
                                                                                     </form>
@@ -520,7 +520,7 @@ export default function CampaignDetails() {
                 </div>
             )
         }
-        </div> 
+        </div>
         <div className={`p-1 m-2 rounded-lg  shadow-xl ${campaignDonors.length > 0 && 'border border-green-300 '}`}>
             {campaignDonors.length > 0 && (
                 <>

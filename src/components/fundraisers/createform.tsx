@@ -16,7 +16,7 @@ export default function CreateForm() {
     })
 
     const TITLE_WORD_LIMIT = 10;
-    const DESCRIPTION_WORD_LIMIT = 100;
+    const DESCRIPTION_WORD_LIMIT = 35;
 
     const countWords = (text: string): number => {
         return text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -113,7 +113,7 @@ export default function CreateForm() {
                             name="title"
                             value={formValues.title}
                             onChange={handleChange}
-                            className="md:w-5/6 p-2 text-white" 
+                            className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                             placeholder="Fundraiser Name" 
                             required
                         />
@@ -125,7 +125,7 @@ export default function CreateForm() {
                 <div className="mb-2">
                     <textarea
                         placeholder="Fundraiser description"
-                        className="textarea textarea-bordered textarea-sm w-full"
+                        className="textarea textarea-bordered textarea-sm w-full darK:text-white text-gray-700 text-base"
                         id="description"
                         name="description"
                         value={formValues.description}
@@ -144,7 +144,7 @@ export default function CreateForm() {
                         name="target"
                         value={formValues.target}
                         onChange={handleChange}
-                        className="text-white md:w-5/6 p-2" 
+                        className="darK:text-white text-gray-700 md:w-5/6 p-2" 
                         placeholder="In ETH" 
                         required
                     />
@@ -157,13 +157,13 @@ export default function CreateForm() {
                         name="durationDays"
                         value={formValues.durationDays}
                         onChange={handleChange}
-                        className="md:w-5/6 p-2 text-white" 
+                        className="md:w-5/6 p-2 darK:text-white text-gray-700" 
                         placeholder="In Days" 
                         required
                     />
                 </label>
                 <div className="w-full m-1 font-semibold text-green-600">
-                    <span>Image Upload</span> <span className="italic text-sm">(1000x1000)</span>
+                    <span>Fundraiser Profile</span>
                 </div>
                 <input 
                     type="file" 
@@ -187,7 +187,7 @@ export default function CreateForm() {
                 <div className="p-1 flex justify-center mt-2">
                     <button 
                         type="submit" 
-                        className="btn bg-green-700 w-1/2 text-white text-base border border-green-700"
+                        className="btn bg-green-700 w-1/2 text-white text-base border border-green-700 hover:bg-green-600"
                     >
                         {
                             isLoading ? (<span className="loading loading-ring loading-xs"></span>) : 'create'
