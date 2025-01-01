@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, Wallet, Globe, Users } from 'lucide-react';
 
-import Web3BrowserCheck from './web3browsercheck';
-
 import logowithtext from '/with-text.png'
 
 import { causes, testimonials } from './data';
@@ -32,7 +30,7 @@ function Home() {
     }
 
   return (
-    <Web3BrowserCheck>
+    <>
     <div className="min-h-screen flex flex-col relative">
       {/* Gradient background */}
       <div 
@@ -166,7 +164,7 @@ function Home() {
         </button>
       </footer>
     </div>
-    </Web3BrowserCheck>
+    </>
   )
 }
 
