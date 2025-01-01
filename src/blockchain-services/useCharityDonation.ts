@@ -31,20 +31,11 @@ const contract = getContract(web3, contractADDR, contractABI);
 //connect to wallet
 export async function connectWallet() : Promise<string | null> {
     try {
-        //check if on mobile device
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         // Check if MetaMask is installed
         const ethereum = (window as any).ethereum;
         if (!ethereum) {
-            if(isMobile){
-                //1. Open MetaMask app
-                window.open('https://metamask.app.link/dapp/undugu-beta.vercel.app');
-                //2. provide instructions
-                //toast.info("Please open this dApp in MetaMask browser or another Web3-enabled browser");
-            } else {
-                console.log('Please install MetaMask!');
-                toast.error("Please install MetaMask or another Web3 wallet");
-            }
+            console.log('Please install MetaMask!');
+            toast.error("Please install MetaMask or another Web3 wallet");
             return null;
         }
 
