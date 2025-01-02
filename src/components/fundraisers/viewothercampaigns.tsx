@@ -211,13 +211,13 @@ export default function ViewOtherCampaigns() {
                                     <span className="font-semibold text-base">Goal: </span>
                                     <span className="font-mono">
                                         {_web3.utils.fromWei(campaign.targetAmount, 'ether')}
-                                    </span> sETH
+                                    </span> ETH
                                 </p>
                                 <p className="text-center">
                                     <span className="font-semibold text-base">Raised: </span>
                                     <span className="font-mono">
                                         {_web3.utils.fromWei(campaign.raisedAmount, 'ether')}
-                                    </span> sETH
+                                    </span> ETH
                                 </p>
                             </div>
                             <div>

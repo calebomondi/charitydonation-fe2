@@ -104,7 +104,7 @@ export default function NavBar() {
                         
                     </li>
                     <li className="h-6 m-1 p-1 flex justify-center items-center text-green-600 font-semibold hover:cursor-pointer">
-                        {balance?.slice(0,6)} sETH
+                        {balance?.slice(0,6)} ETH
                     </li>
                 </ul>
             </div>

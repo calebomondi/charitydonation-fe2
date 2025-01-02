@@ -301,10 +301,10 @@ export default function CampaignDetails() {
                                         <p className="text-lg text-center p-1">{campaign.description}</p>
                                         <div className="flex justify-evenly p-1">
                                             <p className="text-center">
-                                                <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> sETH
+                                                <span className="font-semibold text-base">Target: </span><span className="font-mono">{_web3.utils.fromWei(campaign.targetAmount,'ether')}</span> ETH
                                             </p>
                                             <p className="text-center">
-                                                <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> sETH
+                                                <span className="font-semibold text-base">Raised: </span><span className="font-mono">{_web3.utils.fromWei(campaign.raisedAmount,'ether')}</span> ETH
                                             </p>
                                         </div>
                                         <div>
@@ -314,7 +314,7 @@ export default function CampaignDetails() {
                                             {
                                                 campaign.isCompleted ? (
                                                     <p className="text-center">
-                                                        <span className="font-semibold text-base">Balance: </span><span>{_web3.utils.fromWei(campaign.balance,'ether')} sETH</span>
+                                                        <span className="font-semibold text-base">Balance: </span><span>{_web3.utils.fromWei(campaign.balance,'ether')} ETH</span>
                                                     </p>
                                                 ) : (
                                                     <p className="text-center">

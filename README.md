@@ -21,6 +21,7 @@ Undugu is blockchain-based charity donation platform that enables transparent, s
 - Blockchain Deployment: Ethereum Sepolia
 - Smart Contract: Solidity
 - Web3 Integration: Web3.js
+- Image Database: Supabase
 
 ## Smart Contracts
 
