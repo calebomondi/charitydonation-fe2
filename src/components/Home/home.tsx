@@ -120,7 +120,7 @@ function Home() {
                       />
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span>{parseInt(cause.raised).toLocaleString()} ETH raised</span>
+                      <span>Raised: {parseInt(cause.raised).toLocaleString()} ETH</span>
                       <span>Goal: {parseInt(cause.goal).toLocaleString()} ETH</span>
                     </div>
                   </div>
